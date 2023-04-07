@@ -3,7 +3,7 @@ class Camera {
         this._game = game;
         this.pos = [10,20];
         this.yaw = 0;
-        this.fov = 70;
+        this.fov = 90;
     }
 
     getLookVector() {

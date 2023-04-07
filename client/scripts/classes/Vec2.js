@@ -19,7 +19,7 @@ class Vec2 {
     }
 
     getAngle() {
-        return Math.atan2(this.y, this.x) * Math.PI / 180;
+        return Math.atan2(this.y, this.x);
     }
 
     getLength() {
@@ -35,6 +35,12 @@ class Vec2 {
         let addVec = this.normalize();
         this.x += addVec.x * num;
         this.y += addVec.y * num;
+        return this;
+    }
+
+    addVec(vec) {
+        this.x += vec.x;
+        this.y += vec.y;
         return this;
     }
 }

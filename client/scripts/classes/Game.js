@@ -7,34 +7,9 @@ class Game {
             focus: null
         }
 
-
-        this._map = [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 1, 1.4, 1.3, 1.3, 1.4, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1.3, 2.4, 3.5, 2.4, 1.3, 1, 1]
-        ]
-
         this._camera = new Camera(this);
         this.inputManager = new InputManager(this);
+        this._worldRenderer = new WorldRenderer(this);
 
         this.debug = {
             fps: 0,
@@ -52,12 +27,12 @@ class Game {
         this.debug.draws = 0;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = "brown"
+        ctx.fillStyle = "black"
         ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2)
 
-        ctx.fillStyle = "blue"
+        ctx.fillStyle = "black"
         ctx.fillRect(0, 0, canvas.width, canvas.height / 2)
-        this.renderMapOld();
+        this._worldRenderer.render();
         this.renderMinimap();
         ctx.fillStyle = `black`;
         ctx.fillRect(canvas.width / 2 - 5, canvas.height / 2 - 5, 5, 5)
@@ -68,7 +43,7 @@ class Game {
         this.debug.fpsC++;
     }
 
-    renderMapOld() {
+    renderWorld() {
         let lastIntersection = null;
         for (let i = 0; i <= this._rays; i++) {
             let angle = (-this._rays / 2 + i) * (this._camera.fov / this._rays);
@@ -96,7 +71,7 @@ class Game {
                     isEdge = true;
                 }
 
-                let height = (this._maxDistance - distanceToObj) / this._maxDistance;
+                let height = 2 / distanceToObj;
                 
                 let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
 
@@ -110,84 +85,11 @@ class Game {
         }
     }
 
-    // Нужно учесть дальний оффсет
-    renderMap() {
-        for (let i = 0; i <= this._rays; i++) {
-            let angle = (-this._rays / 2 + i) * (this._camera.fov / this._rays);
-
-            let currDistance = this._maxDistance;
-            while (currDistance > 0) {
-                let cameraPosVec = new Vec2(this._camera.pos[0], this._camera.pos[1]);
-                let rayVec = Vec2.getByDirection(angle + this._camera.yaw);
-                let wall = this.hasWallOn(Vec2.addVectors(cameraPosVec, rayVec.setLength(currDistance)));
-
-                if (wall) {
-                    let height = (this._maxDistance - currDistance) / this._maxDistance;
-                    let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
-
-                    let intersectionPoint = Vec2.addVectors(cameraPosVec, rayVec.setLength(currDistance));
-                    ctx.fillStyle = this.getWallColor(this.hasWallOn(intersectionPoint), currDistance, i);
-
-                    ctx.fillRect(canvas.width / this._rays * i - 0.5, canvasFrame, canvas.width / this._rays + 1, canvas.height * height);
-                    this.debug.draws++;
-
-                    rayVec.add(-2)
-                    currDistance -= 2;
-                } else {
-                    rayVec.add(-10 / this._rays)
-                    currDistance -= 10 / this._rays;
-                }
-            }
-        }
-    }
-
-    getWallColor(id, distance, i, isEdge) {
-        let r = 255;
-        let g = 255;
-        let b = 255;
-        let a = 1;
-
-        switch (Math.ceil(id)) {
-            case 1: {
-                r = 255 * ((this._maxDistance - distance) / (this._maxDistance * 2))
-                g = 255 * ((this._maxDistance - distance) / (this._maxDistance * 2))
-                b = 255 * ((this._maxDistance - distance) / (this._maxDistance * 2))
-                break;
-            }
-
-            case 2: {
-                r = 255 * ((this._maxDistance - distance) / (this._maxDistance * 2))
-                g = 0;
-                b = 0;
-                break;
-            }
-
-            case 3: {
-                r = 0;
-                g = 255 * ((this._maxDistance - distance) / (this._maxDistance * 2));
-                b = 0;
-                break;
-            }
-        }
-
-        if (id % 1 != 0)
-            a = id % 1;
-
-        if (isEdge) {
-            r = 12;
-            g = 12;
-            b = 12;
-            a = 1;
-        }
-
-        return `rgba(${r}, ${g}, ${b}, ${a})`
-    }
-
     renderMinimap() {
         //200
         ctx.fillStyle = "black"
-        let onePlace = 400 / this._map.length;
-        ctx.fillRect(10, 10, onePlace * this._map[0].length, onePlace * this._map.length);
+        let onePlace = 400 / this._worldRenderer._worldWalls.length;
+        ctx.fillRect(10, 10, onePlace * this._worldRenderer._worldWalls[0].length, onePlace * this._worldRenderer._worldWalls.length);
         this.debug.draws++;
 
         ctx.fillStyle = "yellow";
@@ -202,7 +104,7 @@ class Game {
         ctx.stroke()
 
 
-        this._map.forEach((row, y) => {
+        this._worldRenderer._worldWalls.forEach((row, y) => {
             row.forEach((place, x) => {
                 if (place != 0) {
                     switch (Math.ceil(place)) {
@@ -217,41 +119,15 @@ class Game {
         })
     }
 
-    hasWallOn(vec2) {
-        let x = Math.floor(vec2.x);
-        let y = Math.floor(vec2.y);
-
-        if (x >= this._map[0].length)
-            return false;
-
-        if (y >= this._map.length)
-            return false;
-
-        if (x < 0)
-            return false;
-
-        if (y < 0)
-            return false;
-        if (this._map[y][x] != 0) {
-            return this._map[y][x];
-        }
-
-        return false;
-    }
-
-    getPlacePosByVec(vec2) {
-        return [Math.floor(vec2.x), Math.floor(vec2.y)];
-    }
-
     update() {
         this.updateControls();
-        if (this.debug.ticks == 0) {
-            this._maxDistance = 0;
-        } else if (this.debug.ticks > 0 && this.debug.ticks < 500) {
-            this._maxDistance = this.debug.ticks / 25;
-            this._camera.yaw = -this.debug.ticks / 10;
-        }
 
+        /*
+        if (this._worldRenderer._maxDistance < 30)
+            this._worldRenderer._maxDistance+=0.05;
+
+        if (this._worldRenderer._rays < 300)
+            this._worldRenderer._rays += 1;*/
 
         this.debug.ticks++;
     }
@@ -286,39 +162,39 @@ class Game {
         }
 
         if (this.inputManager.isPressed("KeyR")) {
-            this._rays+=10;
+            this._worldRenderer._rays+=10;
 
 
-            if (this._rays > 1000)
-                this._rays = 1000;
+            if (this._worldRenderer._rays > 1000)
+                this._worldRenderer._rays = 1000;
         }
 
         if (this.inputManager.isPressed("KeyT")) {
-            this._rays-=10;
+            this._worldRenderer._rays-=10;
 
-            if (this._rays < 5)
-                this._rays = 5;
+            if (this._worldRenderer._rays < 5)
+                this._worldRenderer._rays = 5;
         }
 
         if (this.inputManager.isPressed("KeyF")) {
-            this._maxDistance += 0.1;
+            this._worldRenderer._maxDistance += 0.1;
         }
 
         if (this.inputManager.isPressed("KeyG")) {
-            this._maxDistance -= 0.1;
+            this._worldRenderer._maxDistance -= 0.1;
         }
 
         if (this._camera.pos[0] < 0)
             this._camera.pos[0] = 0;
 
-        if (this._camera.pos[0] > this._map[0].length)
-            this._camera.pos[0] = this._map[0].length;
+        if (this._camera.pos[0] > this._worldRenderer._worldWalls[0].length)
+            this._camera.pos[0] = this._worldRenderer._worldWalls[0].length;
 
         if (this._camera.pos[1] < 0)
             this._camera.pos[1] = 0;
 
-        if (this._camera.pos[1] > this._map.length)
-            this._camera.pos[1] = this._map.length;
+        if (this._camera.pos[1] > this._worldRenderer._worldWalls.length)
+            this._camera.pos[1] = this._worldRenderer._worldWalls.length;
     }
 
     onmouseup(pos) {

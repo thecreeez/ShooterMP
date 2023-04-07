@@ -25,7 +25,7 @@ class Game {
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 1, 1.4, 1.3, 1.3, 1.4, 1, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -63,12 +63,13 @@ class Game {
         ctx.fillRect(canvas.width / 2 - 5, canvas.height / 2 - 5, 5, 5)
 
         ctx.fillStyle = "white";
-        ctx.fillText("FPS: "+this.debug.fps+" Ticks: "+this.debug.ticks+" Rays: "+this._rays+" MD: "+this._maxDistance+" Draws: "+this.debug.draws, 10, canvas.height - 60);
+        ctx.fillText("FPS: "+this.debug.fps+" Ticks: "+this.debug.ticks+" Rays: "+this._rays+" MD: "+this._maxDistance+" Draws: "+this.debug.draws+" Pos: "+this._camera.pos, 10, canvas.height - 60);
 
         this.debug.fpsC++;
     }
 
     renderMapOld() {
+        let lastIntersection = null;
         for (let i = 0; i <= this._rays; i++) {
             let angle = (-this._rays / 2 + i) * (this._camera.fov / this._rays);
             
@@ -88,15 +89,23 @@ class Game {
             }
 
             if (distanceToObj != -1) {
+                let intersectionPoint = Vec2.addVectors(cameraPosVec, rayVec);
+                let wallPos = this.getPlacePosByVec(intersectionPoint);
+                let isEdge = false;
+                if (lastIntersection != wallPos[0]+":"+wallPos[1]) {
+                    isEdge = true;
+                }
+
                 let height = (this._maxDistance - distanceToObj) / this._maxDistance;
                 
                 let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
 
-                let intersectionPoint = Vec2.addVectors(cameraPosVec, rayVec);
-                ctx.fillStyle = this.getWallColor(this.hasWallOn(intersectionPoint), distanceToObj, i);
+                ctx.fillStyle = this.getWallColor(this.hasWallOn(intersectionPoint), distanceToObj, i, isEdge);
                 
                 ctx.fillRect(canvas.width / this._rays * i - 0.5, canvasFrame, canvas.width / this._rays + 1, canvas.height * height);
                 this.debug.draws++;
+
+                lastIntersection = wallPos[0] + ":" + wallPos[1];
             }
         }
     }
@@ -132,7 +141,7 @@ class Game {
         }
     }
 
-    getWallColor(id, distance, i) {
+    getWallColor(id, distance, i, isEdge) {
         let r = 255;
         let g = 255;
         let b = 255;
@@ -163,6 +172,13 @@ class Game {
 
         if (id % 1 != 0)
             a = id % 1;
+
+        if (isEdge) {
+            r = 12;
+            g = 12;
+            b = 12;
+            a = 1;
+        }
 
         return `rgba(${r}, ${g}, ${b}, ${a})`
     }
@@ -202,7 +218,7 @@ class Game {
     }
 
     hasWallOn(vec2) {
-        let x = Math.ceil(vec2.x);
+        let x = Math.floor(vec2.x);
         let y = Math.floor(vec2.y);
 
         if (x >= this._map[0].length)
@@ -223,12 +239,17 @@ class Game {
         return false;
     }
 
+    getPlacePosByVec(vec2) {
+        return [Math.floor(vec2.x), Math.floor(vec2.y)];
+    }
+
     update() {
         this.updateControls();
         if (this.debug.ticks == 0) {
             this._maxDistance = 0;
         } else if (this.debug.ticks > 0 && this.debug.ticks < 500) {
             this._maxDistance = this.debug.ticks / 25;
+            this._camera.yaw = -this.debug.ticks / 10;
         }
 
 

@@ -39,9 +39,11 @@ class WorldRenderer {
         this._entities.forEach((entity) => {
             entity.render(this);
         })
+
+        this._renderWalls(this._entities);
     }
 
-    _renderWalls() {
+    _renderWalls(entities) {
         let lastIntersection = null;
         for (let i = 0; i <= this._rays; i++) {
             let angle = (-this._rays / 2 + i) * (this._game._camera.fov / this._rays);
@@ -75,12 +77,53 @@ class WorldRenderer {
 
                 ctx.fillStyle = this._getWallColor(this._getWallId(intersectionPoint), distanceToObj, i, isEdge);
 
-                ctx.fillRect(canvas.width / this._rays * i - 0.5, canvasFrame, canvas.width / this._rays + 1, canvas.height * height);
-                this._game.debug.draws++;
+                if (entities) {
+                    entities.forEach((entity) => {
+                        let renderPlace = entity.getRenderPlace(this);
+
+                        if (renderPlace.x[0] < canvas.width / this._rays * i - 0.5 && renderPlace.x[1] > canvas.width / this._rays * i - 0.5 + canvas.width / this._rays + 1) {
+                            if (distanceToObj < entity.getDistanceToCamera(this)) {
+                                ctx.fillRect(canvas.width / this._rays * i - 0.5, canvasFrame, canvas.width / this._rays + 1, canvas.height * height);
+                                this._game.debug.draws++;
+                            }
+                        }
+                    })
+                } else {
+                    ctx.fillRect(canvas.width / this._rays * i - 0.5, canvasFrame, canvas.width / this._rays + 1, canvas.height * height);
+                    this._game.debug.draws++;
+                }
 
                 lastIntersection = wallPos[0] + ":" + wallPos[1];
             }
         }
+    }
+
+    _renderTextOnWorld(pos, text, height) {
+        let posVec = new Vec2(pos[0], pos[1]);
+        let cam = this._game._camera;
+
+        posVec.addVec(new Vec2(-cam.pos[0], -cam.pos[1]));
+
+        if (posVec.getLength() > this._maxDistance)
+            return;
+
+        let angleToText = posVec.getAngle() % 360;
+
+        let angleOnScreen = cam.yaw - angleToText;
+
+        if (cam.yaw > 180 && angleToText < 180) {
+            angleOnScreen -= 360;
+        }
+
+        if (cam.yaw < 180 && angleToText > 180) {
+            angleOnScreen -= 360;
+        }
+
+        let xScreen = (-angleOnScreen + 45) / cam.fov;
+
+        ctx.fillStyle = "red";
+        ctx.font = (100 / posVec.getLength())+"px arial";
+        ctx.fillText(text, canvas.width * xScreen, this.getFloorY(posVec.getLength()) + canvas.height / posVec.getLength() + height / posVec.getLength())
     }
 
     _getWallId(vec2) {
@@ -149,5 +192,12 @@ class WorldRenderer {
         }
 
         return `rgba(${r}, ${g}, ${b}, ${a})`
+    }
+
+    getFloorY(distance) {
+        let height = 2 / distance;
+
+        let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
+        return canvasFrame;
     }
 }

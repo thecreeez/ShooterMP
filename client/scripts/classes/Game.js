@@ -38,6 +38,7 @@ class Game {
         ctx.fillRect(canvas.width / 2 - 5, canvas.height / 2 - 5, 5, 5)
 
         ctx.fillStyle = "white";
+        ctx.font = "20px arial";
         ctx.fillText("FPS: "+this.debug.fps+" Ticks: "+this.debug.ticks+" Rays: "+this._rays+" MD: "+this._maxDistance+" Draws: "+this.debug.draws+" Pos: "+this._camera.pos, 10, canvas.height - 60);
 
         this.debug.fpsC++;
@@ -206,7 +207,7 @@ class Game {
         let delta = [pos[0] - this.mouse.pos[0], pos[1] - this.mouse.pos[1]];
 
         if (this.mouse.isDown)
-            this._camera.yaw -= delta[0] / 20;
+            this._camera.setYaw(this._camera.yaw - delta[0] / 20);
         this.mouse.pos = pos;
     }
 

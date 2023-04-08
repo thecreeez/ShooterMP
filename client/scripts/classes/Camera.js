@@ -9,4 +9,12 @@ class Camera {
     getLookVector() {
         return Vec2.getByDirection(this.yaw);
     }
+
+    setYaw(yaw) {
+        if (yaw < 0) {
+            this.yaw = 360 - (yaw % 360);
+        } else {
+            this.yaw = yaw % 360;
+        }
+    }
 }

@@ -127,8 +127,8 @@ class WorldRenderer {
     }
 
     _getWallId(vec2) {
-        let x = Math.floor(vec2.x);
-        let y = Math.floor(vec2.y);
+        let x = Math.round(vec2.x);
+        let y = Math.round(vec2.y);
 
         if (x >= this._worldWalls[0].length)
             return false;
@@ -149,7 +149,7 @@ class WorldRenderer {
     }
 
     _getWallPosByVec(vec2) {
-        return [Math.floor(vec2.x), Math.floor(vec2.y)];
+        return [Math.round(vec2.x), Math.round(vec2.y)];
     }
 
     _getWallColor(id, distance, i, isEdge) {

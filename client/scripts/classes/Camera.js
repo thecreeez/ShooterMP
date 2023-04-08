@@ -17,4 +17,12 @@ class Camera {
             this.yaw = yaw % 360;
         }
     }
+
+    move(x,y) {
+        if (this._game.canMove(this.pos[0] + x,this.pos[1] + y)) {
+            this.pos[0] += x;
+            this.pos[1] += y;
+        }
+
+    }
 }

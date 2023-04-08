@@ -10,6 +10,7 @@ class Game {
         this._camera = new Camera(this);
         this.inputManager = new InputManager(this);
         this._worldRenderer = new WorldRenderer(this);
+        this._packetManager = new PacketManager(this);
 
         this.debug = {
             fps: 0,
@@ -137,29 +138,25 @@ class Game {
         if (this.inputManager.isPressed("KeyW")) {
             let moveVec = Vec2.getByDirection(this._camera.yaw);
             moveVec = moveVec.setLength(0.05);
-            this._camera.pos[0] += moveVec.x;
-            this._camera.pos[1] += moveVec.y;
+            this._camera.move(moveVec.x, moveVec.y);
         }
 
         if (this.inputManager.isPressed("KeyA")) {
             let moveVec = Vec2.getByDirection(this._camera.yaw + 90);
             moveVec = moveVec.setLength(0.025);
-            this._camera.pos[0] -= moveVec.x;
-            this._camera.pos[1] -= moveVec.y;
+            this._camera.move(-moveVec.x, -moveVec.y);
         }
 
         if (this.inputManager.isPressed("KeyS")) {
             let moveVec = Vec2.getByDirection(this._camera.yaw);
             moveVec = moveVec.setLength(0.05);
-            this._camera.pos[0] -= moveVec.x;
-            this._camera.pos[1] -= moveVec.y;
+            this._camera.move(-moveVec.x, -moveVec.y);
         }
 
         if (this.inputManager.isPressed("KeyD")) {
             let moveVec = Vec2.getByDirection(this._camera.yaw + 90);
             moveVec = moveVec.setLength(0.025);
-            this._camera.pos[0] += moveVec.x;
-            this._camera.pos[1] += moveVec.y;
+            this._camera.move(moveVec.x, moveVec.y);
         }
 
         if (this.inputManager.isPressed("KeyR")) {
@@ -226,5 +223,16 @@ class Game {
 
     getInputManager() {
         return this.inputManager;
+    }
+
+    canMove(x, y) {
+        let xW = Math.round(x);
+        let yW = Math.round(y);
+
+        if (this._worldRenderer._worldWalls[yW][xW] != 0) {
+            return false;
+        }
+
+        return true;
     }
 }

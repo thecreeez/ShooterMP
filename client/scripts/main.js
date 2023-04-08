@@ -32,3 +32,12 @@ function update() {
 function count() {
     GameInstance.count();
 }
+
+async function connect() {
+    await GameInstance._packetManager.connect("localhost", 2020);
+    console.log("connected!");
+}
+
+async function debugSend(message) {
+    GameInstance._packetManager.send(message)
+}

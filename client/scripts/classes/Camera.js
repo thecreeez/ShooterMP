@@ -3,6 +3,7 @@ class Camera {
         this._game = game;
         this.pos = [10,20];
         this.yaw = 0;
+        this.pitch = 0;
         this.fov = 90;
     }
 
@@ -24,5 +25,9 @@ class Camera {
             this.pos[1] += y;
         }
 
+    }
+
+    setPos(pos) {
+        this.pos = pos;
     }
 }

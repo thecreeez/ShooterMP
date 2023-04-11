@@ -1,8 +1,15 @@
+import EntityManager from "./modules/EntityManager.js";
 import PacketManager from "./modules/PacketManager.js";
+import WorldManager from "./modules/WorldManager.js";
 
 class Server {
-    constructor() {
+    constructor(map) {
         this._packetManager = new PacketManager(this);
+        this._entityManager = new EntityManager(this);
+        
+        this._worldManager = new WorldManager(this, map);
+
+        this.defaultSpawnPosition = [5,5]
     }
 
     start(port) {
@@ -11,6 +18,14 @@ class Server {
 
     getPacketManager() {
         return this._packetManager;
+    }
+
+    getEntityManager() {
+        return this._entityManager;
+    }
+
+    getWorldManager() {
+        return this._worldManager;
     }
 }
 

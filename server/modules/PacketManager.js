@@ -12,7 +12,8 @@ class PacketManager {
             })
 
             conn.on('close', () => {
-                this._server.getOnlinePlayerManager().disconnect(conn.id);
+                console.log("closed")
+                this._server.getEntityManager().disconnect(conn.id);
             })
         })
 

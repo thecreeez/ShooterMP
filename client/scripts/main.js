@@ -41,3 +41,22 @@ async function connect() {
 async function debugSend(message) {
     GameInstance._packetManager.send(message)
 }
+
+async function connect(ip, port) {
+    if (!localStorage.getItem("username")) {
+        return console.log("Невозможно подключиться к серверу, установите имя (setNickname('Имя'))")
+    }
+
+    try {
+        await GameInstance._packetManager.connect(ip, port);
+        GameInstance._packetManager.onConnect(() => {
+            GameInstance._packetManager.send("handshake/" + localStorage.getItem("username"))
+        })
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+function setNickname(newName) {
+    localStorage.setItem("username", newName);
+}

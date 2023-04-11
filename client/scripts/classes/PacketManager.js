@@ -6,6 +6,7 @@ class PacketManager {
         this._state = CONNECT_STATE.CLOSED;
 
         this.packets = {};
+        this.onConnectFunctions = [];
     }
 
     connect(ip, port) {
@@ -14,6 +15,9 @@ class PacketManager {
         this._sockjs = new SockJS("http://" + ip + ":" + port + "/socket", null, { timeout: 10000 });
         this._sockjs.onopen = (e) => {
             this._state = CONNECT_STATE.OPENED;
+            this.onConnectFunctions.forEach((func) => {
+                func();
+            })
         }
 
         this._sockjs.onmessage = (e) => {
@@ -25,13 +29,17 @@ class PacketManager {
         }
     }
 
+    onConnect(func) {
+        this.onConnectFunctions.push(func);
+    }
+
     receive(message) {
         const args = message.split("/");
 
         if (this.packets[args[0]])
             this.packets[args[0]](args);
         else
-            this._game.getLogger().error("PACKET", "Неизвестный пакет: " + args[0])
+            console.error("PACKET", "Неизвестный пакет: " + args[0])
     }
 
     send(message) {

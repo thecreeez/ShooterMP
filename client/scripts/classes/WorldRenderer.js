@@ -1,37 +1,53 @@
 class WorldRenderer {
     constructor(game) {
         this._game = game;
-        this._worldWalls = [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 1, 1.4, 1.3, 1.3, 1.4, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1.3, 2.4, 3.5, 2.4, 1.3, 1, 1]
-        ]
 
-        this._entities = [
-            new Entity([6,10], "blue")
-        ];
+        this.shouldRender = false;
+        this._worldWalls = false;
+
+        this._entities = [];
 
         this._maxDistance = 30;
         this._rays = 200;
+    }
+
+    setMap(map) {
+        this._worldWalls = map;
+    }
+
+    setEntities(entities) {
+        this._entities = [];
+
+        entities.forEach((entity) => {
+            this._entities.push(Entity.fromServer(entity));
+        })
+    }
+
+    addEntity(entity) {
+        this._entities.push(Entity.fromServer(entity));
+    }
+
+    getEntity(name) {
+        let entity = false;
+        this._entities.forEach((entityCandidate, index) => {
+            if (entityCandidate.name == name) {
+                entity = entityCandidate;
+            }
+        });
+
+        return entity;
+    } 
+
+    removeEntity(entityName) {
+        let removeI = -1;
+        this._entities.forEach((entityCandidate, index) => {
+            if (entityCandidate.name == entityName) {
+                removeI = index;
+            }
+        });
+
+        if (removeI != -1)
+            this._entities.splice(removeI, 1);
     }
 
     render() {
@@ -71,9 +87,12 @@ class WorldRenderer {
                     isEdge = true;
                 }
 
-                let height = 2 / distanceToObj;
+                let height = 2 / distanceToObj / Math.cos(angle * (Math.PI / 180));
 
                 let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
+
+                if (this._game._camera.pitch != 0)
+                    canvasFrame *= this._game._camera.pitch;
 
                 ctx.fillStyle = this._getWallColor(this._getWallId(intersectionPoint), distanceToObj, i, isEdge);
 
@@ -198,6 +217,9 @@ class WorldRenderer {
         let height = 2 / distance;
 
         let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
+
+        if (this._game._camera.pitch != 0)
+            canvasFrame *= this._game._camera.pitch;
         return canvasFrame;
     }
 }

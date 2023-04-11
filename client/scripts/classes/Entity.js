@@ -6,6 +6,22 @@ class Entity {
         this.width = 400;
     }
 
+    static fromServer(entity) {
+        switch (entity.type) {
+            case "player": {
+                return new EntityPlayer({
+                    name: entity.name,
+                    pos: entity.pos,
+                });
+                break;
+            }
+        }
+    }
+
+    teleport(pos) {
+        this.pos = pos;
+    }
+
     render(worldRenderer) {
         if (!this.isNeedRender(worldRenderer))
             return;
@@ -31,8 +47,6 @@ class Entity {
 
         ctx.fillStyle = this.getColor(posVec.getLength(), worldRenderer);
         ctx.fillRect(canvas.width * xScreen, worldRenderer.getFloorY(posVec.getLength()), this.width * 2 / posVec.getLength(), canvas.height * 2 / posVec.getLength());
-
-        worldRenderer._renderTextOnWorld(this.pos, "Player1", 20)
     }
 
     getColor(distance, worldRenderer) {

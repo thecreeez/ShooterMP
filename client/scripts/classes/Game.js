@@ -11,6 +11,7 @@ class Game {
         this.inputManager = new InputManager(this);
         this._worldRenderer = new WorldRenderer(this);
         this._packetManager = new PacketManager(this);
+        this._loggerRenderer = new LoggerRenderer(this);
 
         this.debug = {
             fps: 0,
@@ -34,9 +35,7 @@ class Game {
     getEntity(name) {
         return this._worldRenderer.getEntity(name);
     }
-
     
-
     join(entity) {
         this._worldRenderer.addEntity(entity);
     }
@@ -49,24 +48,25 @@ class Game {
         this.debug.draws = 0;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (this._worldRenderer.shouldRender) {
-            ctx.fillStyle = "black"
-            ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2)
+        ctx.fillStyle = "black";
+        ctx.fillRect(0,0,canvas.width, canvas.height);
 
-            ctx.fillStyle = "black"
-            ctx.fillRect(0, 0, canvas.width, canvas.height / 2)
+        if (this._worldRenderer.shouldRender) {
             this._worldRenderer.render();
             this.renderMinimap();
-            ctx.fillStyle = `black`;
-            ctx.fillRect(canvas.width / 2 - 5, canvas.height / 2 - 5, 5, 5)
         }
 
-        ctx.fillStyle = "white";
-        ctx.font = "20px arial";
-        ctx.fillText("FPS: "+this.debug.fps+" Ticks: "+this.debug.ticks+" Rays: "+this._rays+" MD: "+this._maxDistance+" Draws: "+this.debug.draws+" Pos: "+this._camera.pos, 10, canvas.height - 60);
-        ctx.fillText("Name: "+localStorage.getItem("username"), 10, canvas.height - 80);
+        this.renderDebug();
 
         this.debug.fpsC++;
+    }
+
+    renderDebug() {
+        ctx.fillStyle = "white";
+        ctx.font = "20px arial";
+        ctx.fillText("FPS: " + this.debug.fps + " Ticks: " + this.debug.ticks + " Rays: " + this._rays + " MD: " + this._maxDistance + " Draws: " + this.debug.draws + " Pos: " + this._camera.pos, 10, canvas.height - 60);
+        ctx.fillText("Name: " + localStorage.getItem("username"), 10, canvas.height - 80);
+        this._loggerRenderer.render([10, 10], 50);
     }
 
     renderMinimap() {
@@ -107,13 +107,6 @@ class Game {
         if (this._worldRenderer.shouldRender) {
             this.updateControls();
         }
-
-        /*
-        if (this._worldRenderer._maxDistance < 30)
-            this._worldRenderer._maxDistance+=0.05;
-
-        if (this._worldRenderer._rays < 300)
-            this._worldRenderer._rays += 1;*/
 
         this.debug.ticks++;
     }
@@ -165,6 +158,7 @@ class Game {
 
         if (this.inputManager.isPressed("KeyF")) {
             this._worldRenderer._maxDistance += 0.1;
+            this._loggerRenderer.log("TEST", "TEST TEST TEST", LOG_TYPE.DEFAULT)
         }
 
         if (this.inputManager.isPressed("KeyG")) {
@@ -218,6 +212,10 @@ class Game {
 
     getPacketManager() {
         return this._packetManager;
+    }
+
+    getLoggerRenderer() {
+        return this._loggerRenderer;
     }
 
     canMove(x, y) {

@@ -53,12 +53,9 @@ class WorldRenderer {
     render() {
         this._renderWalls();
 
-        console.log("Очередь рендера: ")
         this._entities.sort((a, b) => b.getDistanceToCamera(this) - a.getDistanceToCamera(this)).forEach((entity) => {
-            console.log(entity.name)
             entity.render(this);
         })
-        console.log("=================")
 
         this._renderWalls(this._entities);
     }

@@ -3,7 +3,7 @@
 GameInstance.getPacketManager().registerPacket("handshake", (args) => {
     switch (args[1]) {
         case "fail": {
-            console.log(args);
+            GameInstance.getLoggerRenderer().log("PacketManager", "Cant connected to server: "+args[2], LOG_TYPE.ERROR)
             break;
         }
 
@@ -14,6 +14,8 @@ GameInstance.getPacketManager().registerPacket("handshake", (args) => {
                 entities: JSON.parse(args[3]),
                 pos: JSON.parse(args[4])
             });
+
+            GameInstance.getLoggerRenderer().log("PacketManager", "Server successfully connected!", LOG_TYPE.FINE)
             break;
         }
     }
@@ -24,12 +26,16 @@ GameInstance.getPacketManager().registerPacket("event", (args) => {
         case "connect": {
             console.log("Connect: ",args)
             GameInstance.join(JSON.parse(args[2]));
+
+            GameInstance.getLoggerRenderer().log("PacketManager", "User "+JSON.parse(args[2]).name+" connected.", LOG_TYPE.FINE)
             break;
         }
 
         case "disconnect": {
             console.log("Disconnect: ", args)
             GameInstance.disconnect(JSON.parse(args[2]));
+
+            GameInstance.getLoggerRenderer().log("PacketManager", "User " + JSON.parse(args[2]).name + " disconnected.", LOG_TYPE.FINE)
             break;
         }
 

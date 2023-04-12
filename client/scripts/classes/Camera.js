@@ -4,7 +4,7 @@ class Camera {
         this.pos = [10,20];
         this.yaw = 0;
         this.pitch = 0;
-        this.fov = 90;
+        this.fov = 110;
     }
 
     getLookVector() {

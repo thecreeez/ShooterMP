@@ -44,10 +44,23 @@ class Game {
 
     render() {
         this.debug.draws = 0;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = "black";
-        ctx.fillRect(0,0,canvas.width, canvas.height);
+        if (!GAME_EVENT_WONT_DELETE_FRAMES) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (!SHOULD_RENDER_SKYBOX) {
+                ctx.fillStyle = "black";
+
+                if (GAME_EVENT_INVERTED_COLORS) {
+                    ctx.fillStyle = "white";
+                }
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                this.renderSky();
+                this.renderFloor();
+            }
+            
+        }
 
         if (this._worldRenderer.shouldRender) {
 
@@ -58,6 +71,24 @@ class Game {
         this.renderDebug();
 
         this.debug.fpsC++;
+    }
+
+    renderSky() {
+        ctx.fillStyle = `rgb(${SKY_COLOR[0]},${SKY_COLOR[1]},${SKY_COLOR[2]})`;
+
+        if (GAME_EVENT_INVERTED_COLORS) {
+            ctx.fillStyle = `rgb(${255 - SKY_COLOR[0]},${255 - SKY_COLOR[1]},${255 - SKY_COLOR[2]})`;
+        }
+        ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
+    }
+
+    renderFloor() {
+        ctx.fillStyle = `rgb(${FLOOR_COLOR[0]},${FLOOR_COLOR[1]},${FLOOR_COLOR[2]})`;
+
+        if (GAME_EVENT_INVERTED_COLORS) {
+            ctx.fillStyle = `rgb(${255 - FLOOR_COLOR[0]},${255 - FLOOR_COLOR[1]},${255 - FLOOR_COLOR[2]})`;
+        }
+        ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
     }
 
     renderDebug() {
@@ -105,6 +136,11 @@ class Game {
     update() {
         if (this._worldRenderer.shouldRender) {
             this.updateControls();
+            
+            if (GAME_EVENT_Y_IS_HEIGHT)
+                this._worldRenderer.WORLD_SIZE = this._camera.pos[1];
+            else
+                this._worldRenderer.WORLD_SIZE = 1;
         }
 
         this.debug.ticks++;

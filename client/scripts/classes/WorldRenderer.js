@@ -55,7 +55,7 @@ class WorldRenderer {
 
     render() {
         let renderMethod = "_renderWalls";
-        if (this.textureRender) {
+        if (RENDER_TYPE == RENDER_TYPES.TEXTURIZED) {
             renderMethod = "_renderWallsWithTexture";
         }
         this[renderMethod]();
@@ -185,7 +185,7 @@ class WorldRenderer {
 
     _renderTexturedLine(x, y, width, height, xOffset, texture, distance) {
         for (let i = 0; i < texture.length; i++) {
-            if (GAME_EVENT_MAX_DRAWS_IS_1000 && this._game.debug.draws > 1000)
+            if (GAME_EVENT_MAX_DRAWS != -1 && this._game.debug.draws > GAME_EVENT_MAX_DRAWS)
                 return;
 
             let r = texture[i][xOffset][0];
@@ -196,15 +196,27 @@ class WorldRenderer {
             g = g * ((this._maxDistance - distance) / (this._maxDistance * 2))
             b = b * ((this._maxDistance - distance) / (this._maxDistance * 2))
 
+            if (GAME_EVENT_DANCING_ROOM) {
+                r = Math.random() * 255;
+                g = Math.random() * 255;
+                b = Math.random() * 255
+            }
+
+            if (GAME_EVENT_INVERTED_COLORS) {
+                r = 255 -r;
+                g = 255 - g;
+                b = 255 -b;
+            }
+
             ctx.fillStyle = `rgb(${r},${g},${b})`;
-            ctx.fillRect(x + (width / texture.length * xOffset), y + (height / texture.length * i), width / texture.length, height / texture.length);
+            ctx.fillRect(x + (width / texture.length * xOffset), y + (height / texture.length * i), (width * 3) / texture.length, height / texture.length);
 
             this._game.debug.draws++;
         }
     }
 
     _renderLine(x,y,width,height) {
-        if (GAME_EVENT_MAX_DRAWS_IS_1000 && this._game_debug.draws > 1000)
+        if (GAME_EVENT_MAX_DRAWS != -1 && this._game.debug.draws > GAME_EVENT_MAX_DRAWS)
             return;
 
         ctx.fillRect(x,y,width,height);
@@ -303,6 +315,12 @@ class WorldRenderer {
             g = 12;
             b = 12;
             a = 1;
+        }
+
+        if (GAME_EVENT_INVERTED_COLORS) {
+            r = 255 - r;
+            g = 255 - g;
+            b = 255 - b;
         }
 
         return `rgba(${r}, ${g}, ${b}, ${a})`

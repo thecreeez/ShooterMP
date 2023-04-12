@@ -21,8 +21,6 @@ class Game {
             draws: 0
         }
 
-        this._rays = 50;
-        this._maxDistance = 10;
     }
 
     load({map, entities, pos}) {
@@ -52,6 +50,7 @@ class Game {
         ctx.fillRect(0,0,canvas.width, canvas.height);
 
         if (this._worldRenderer.shouldRender) {
+
             this._worldRenderer.render();
             this.renderMinimap();
         }
@@ -64,7 +63,7 @@ class Game {
     renderDebug() {
         ctx.fillStyle = "white";
         ctx.font = "20px arial";
-        ctx.fillText("FPS: " + this.debug.fps + " Ticks: " + this.debug.ticks + " Rays: " + this._rays + " MD: " + this._maxDistance + " Draws: " + this.debug.draws + " Pos: " + this._camera.pos, 10, canvas.height - 60);
+        ctx.fillText("FPS: " + this.debug.fps + " Ticks: " + this.debug.ticks + " Rays: " + this._worldRenderer._rays + " MD: " + this._worldRenderer._maxDistance + " Draws: " + this.debug.draws + " Pos: " + this._camera.pos, 10, canvas.height - 60);
         ctx.fillText("Name: " + localStorage.getItem("username"), 10, canvas.height - 80);
         this._loggerRenderer.render([10, 10], 50);
     }
@@ -158,7 +157,6 @@ class Game {
 
         if (this.inputManager.isPressed("KeyF")) {
             this._worldRenderer._maxDistance += 0.1;
-            this._loggerRenderer.log("TEST", "TEST TEST TEST", LOG_TYPE.DEFAULT)
         }
 
         if (this.inputManager.isPressed("KeyG")) {

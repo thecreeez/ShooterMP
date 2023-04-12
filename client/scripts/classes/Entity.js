@@ -46,7 +46,7 @@ class Entity {
         let xScreen = (-angleOnScreen + 45) / cam.fov;
 
         ctx.fillStyle = this.getColor(posVec.getLength(), worldRenderer);
-        ctx.fillRect(canvas.width * xScreen, worldRenderer.getFloorY(posVec.getLength()), this.width * 2 / posVec.getLength(), canvas.height * 2 / posVec.getLength());
+        ctx.fillRect(canvas.width * xScreen, worldRenderer.getFloorY(posVec.getLength()), this.width * 2 / posVec.getLength(), canvas.height * worldRenderer.WORLD_SIZE / posVec.getLength());
     }
 
     getColor(distance, worldRenderer) {

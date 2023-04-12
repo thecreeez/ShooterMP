@@ -27,7 +27,7 @@ GameInstance.getPacketManager().registerPacket("event", (args) => {
             console.log("Connect: ",args)
             GameInstance.join(JSON.parse(args[2]));
 
-            GameInstance.getLoggerRenderer().log("PacketManager", "User "+JSON.parse(args[2]).name+" connected.", LOG_TYPE.FINE)
+            GameInstance.getLoggerRenderer().log("PacketManager", "User " + JSON.parse(args[2]).name + " connected.", LOG_TYPE.DEFAULT)
             break;
         }
 
@@ -35,7 +35,7 @@ GameInstance.getPacketManager().registerPacket("event", (args) => {
             console.log("Disconnect: ", args)
             GameInstance.disconnect(JSON.parse(args[2]));
 
-            GameInstance.getLoggerRenderer().log("PacketManager", "User " + JSON.parse(args[2]).name + " disconnected.", LOG_TYPE.FINE)
+            GameInstance.getLoggerRenderer().log("PacketManager", "User " + JSON.parse(args[2]).name + " disconnected.", LOG_TYPE.DEFAULT)
             break;
         }
 

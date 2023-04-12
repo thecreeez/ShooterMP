@@ -9,6 +9,9 @@ class WorldRenderer {
 
         this._maxDistance = 30;
         this._rays = 200;
+
+        this.WORLD_SIZE = 1;
+        this.textureRender = true;
     }
 
     setMap(map) {
@@ -51,17 +54,21 @@ class WorldRenderer {
     }
 
     render() {
-        this._renderWalls();
+        let renderMethod = "_renderWalls";
+        if (this.textureRender) {
+            renderMethod = "_renderWallsWithTexture";
+        }
+        this[renderMethod]();
+
 
         this._entities.sort((a, b) => b.getDistanceToCamera(this) - a.getDistanceToCamera(this)).forEach((entity) => {
             entity.render(this);
         })
 
-        this._renderWalls(this._entities);
+        this[renderMethod](this._entities);
     }
 
-    _renderWalls(entities) {
-        let lastIntersection = null;
+    _renderWallsWithTexture(entities) {
         for (let i = 0; i <= this._rays; i++) {
             let angle = (-this._rays / 2 + i) * (this._game._camera.fov / this._rays);
 
@@ -83,12 +90,69 @@ class WorldRenderer {
             if (distanceToObj != -1) {
                 let intersectionPoint = Vec2.addVectors(cameraPosVec, rayVec);
                 let wallPos = this._getWallPosByVec(intersectionPoint);
+
+                let height = this.WORLD_SIZE / distanceToObj / Math.cos(angle * (Math.PI / 180));
+
+                let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
+
+                if (this._game._camera.pitch != 0)
+                    canvasFrame *= this._game._camera.pitch;
+
+                let texture = TEXTURES[Math.ceil(this._getWallId(new Vec2(wallPos[0], wallPos[1])))];
+
+                let textureLine = Math.round(texture.length * Math.abs(intersectionPoint.y - wallPos[1]));
+
+                if (textureLine > Math.round(texture.length * Math.abs(intersectionPoint.x - wallPos[0])))
+                    textureLine = Math.round(texture.length * Math.abs(intersectionPoint.x - wallPos[0]));
+
+                if (entities) {
+                    entities.forEach((entity) => {
+                        let renderPlace = entity.getRenderPlace(this);
+
+                        if (renderPlace.x[0] < canvas.width / this._rays * i - 0.5 && renderPlace.x[1] > canvas.width / this._rays * i - 0.5 + canvas.width / this._rays + 1) {
+                            if (distanceToObj < entity.getDistanceToCamera(this)) {
+                                this._renderTexturedLine(canvas.width / this._rays * i - 0.5, canvasFrame, canvas.width / this._rays + 1, canvas.height * height, textureLine, texture, distanceToObj);
+                            }
+                        }
+                    })
+                } else {
+                    this._renderTexturedLine(canvas.width / this._rays * i - 0.5, canvasFrame, canvas.width / this._rays + 1, canvas.height * height, textureLine, texture, distanceToObj);
+                }
+            }
+        }
+    }
+
+    _renderWalls(entities) {
+        let lastIntersection = null;
+
+        for (let i = 0; i <= this._rays; i++) {
+            let angle = (-this._rays / 2 + i) * (this._game._camera.fov / this._rays);
+
+            let cameraPosVec = new Vec2(this._game._camera.pos[0], this._game._camera.pos[1]);
+            let rayVec = Vec2.getByDirection(angle + this._game._camera.yaw);
+
+            let distanceToObj = -1;
+            let currDistance = 0;
+            while (currDistance < this._maxDistance && distanceToObj == -1) {
+                rayVec.add(10 / this._rays)
+                currDistance += 10 / this._rays;
+
+                let isWall = this._getWallId(Vec2.addVectors(cameraPosVec, rayVec));
+                if (isWall) {
+                    distanceToObj = currDistance;
+                }
+            }
+
+            if (distanceToObj != -1) {
+                let intersectionPoint = Vec2.addVectors(cameraPosVec, rayVec);
+                let wallPos = this._getWallPosByVec(intersectionPoint);
+
                 let isEdge = false;
                 if (lastIntersection != wallPos[0] + ":" + wallPos[1]) {
                     isEdge = true;
                 }
 
-                let height = 2 / distanceToObj / Math.cos(angle * (Math.PI / 180));
+                let height = this.WORLD_SIZE / distanceToObj / Math.cos(angle * (Math.PI / 180));
 
                 let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
 
@@ -103,19 +167,40 @@ class WorldRenderer {
 
                         if (renderPlace.x[0] < canvas.width / this._rays * i - 0.5 && renderPlace.x[1] > canvas.width / this._rays * i - 0.5 + canvas.width / this._rays + 1) {
                             if (distanceToObj < entity.getDistanceToCamera(this)) {
-                                ctx.fillRect(canvas.width / this._rays * i - 0.5, canvasFrame, canvas.width / this._rays + 1, canvas.height * height);
-                                this._game.debug.draws++;
+                                this._renderLine(canvas.width / this._rays * i - 0.5, canvasFrame, canvas.width / this._rays + 1, canvas.height * height);
                             }
                         }
                     })
                 } else {
-                    ctx.fillRect(canvas.width / this._rays * i - 0.5, canvasFrame, canvas.width / this._rays + 1, canvas.height * height);
-                    this._game.debug.draws++;
+                    this._renderLine(canvas.width / this._rays * i - 0.5, canvasFrame, canvas.width / this._rays + 1, canvas.height * height)
                 }
 
                 lastIntersection = wallPos[0] + ":" + wallPos[1];
             }
         }
+    }
+
+    _renderTexturedLine(x, y, width, height, xOffset, texture, distance) {
+        for (let i = 0; i < texture.length; i++) {
+            let r = texture[i][xOffset][0];
+            let g = texture[i][xOffset][1];
+            let b = texture[i][xOffset][2];
+
+            r = r * ((this._maxDistance - distance) / (this._maxDistance * 2))
+            g = g * ((this._maxDistance - distance) / (this._maxDistance * 2))
+            b = b * ((this._maxDistance - distance) / (this._maxDistance * 2))
+
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.fillRect(x + (width / texture.length * xOffset), y + (height / texture.length * i), width / texture.length, height / texture.length);
+
+            this._game.debug.draws++;
+        }
+    }
+
+    _renderLine(x,y,width,height) {
+        ctx.fillRect(x,y,width,height);
+
+        this._game.debug.draws++;
     }
 
     _renderTextOnWorld(pos, text, height) {
@@ -143,7 +228,7 @@ class WorldRenderer {
 
         ctx.fillStyle = "red";
         ctx.font = (100 / posVec.getLength())+"px arial";
-        ctx.fillText(text, canvas.width * xScreen, this.getFloorY(posVec.getLength()) + canvas.height / posVec.getLength() + height / posVec.getLength())
+        ctx.fillText(text, canvas.width * xScreen, this.getFloorY(posVec.getLength()) + canvas.height * this.WORLD_SIZE / posVec.getLength() / 2 + height / posVec.getLength())
     }
 
     _getWallId(vec2) {
@@ -215,7 +300,7 @@ class WorldRenderer {
     }
 
     getFloorY(distance) {
-        let height = 2 / distance;
+        let height = this.WORLD_SIZE / distance;
 
         let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
 
@@ -224,3 +309,37 @@ class WorldRenderer {
         return canvasFrame;
     }
 }
+
+const TEXTURES = [
+    "EMPTY",
+
+    [
+        [[255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255]],
+        [[255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0]],
+        [[255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255]],
+        [[255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0]],
+        [[255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255]],
+        [[255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0]],
+        [[255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255]],
+        [[255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0]],
+    ],
+
+    [
+        [[115, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255]],
+        [[115, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0]],
+        [[115, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255]],
+        [[115, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0]],
+        [[115, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255]],
+        [[115, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0]],
+        [[115, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255]],
+        [[115, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0], [255, 255, 255], [255, 0, 0]],
+    ],
+
+    [
+        [[255, 255, 255]]
+    ],
+
+    [
+        [[120, 15, 130]]
+    ]
+]

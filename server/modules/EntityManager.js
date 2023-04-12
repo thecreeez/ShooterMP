@@ -4,6 +4,8 @@ class EntityManager {
     constructor(server) {
         this._server = server;
         this._entities = new Map();
+
+        this._entities.set("test", new EntityPlayer(this, "test", null, [5,5]))
     }
 
     update() {
@@ -52,7 +54,7 @@ class EntityManager {
         let out = null;
 
         for (let entity of this._entities) {
-            if (entity[1].type == "player" && entity[1]._connection.id == conn.id) {
+            if (entity[1].type == "player" && entity[1]._connection && entity[1]._connection.id == conn.id) {
                 out = entity[1];
             }
         }
@@ -67,7 +69,6 @@ class EntityManager {
             if (!except || except != entity[0])
                 out.push(entity[1].serialize());
         }
-
         return out;
     }
 }

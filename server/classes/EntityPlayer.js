@@ -20,6 +20,9 @@ class EntityPlayer extends Entity {
     }
 
     sendPacket(packet) {
+        if (!this._connection)
+            return;
+
         this._connection.write(packet);
     }
 }

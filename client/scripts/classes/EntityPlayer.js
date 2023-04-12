@@ -3,6 +3,8 @@ class EntityPlayer extends Entity {
         super(pos, "green");
         this.name = name;
         this.width = 400;
+
+        this.type = "player";
     }
 
     render(worldRenderer) {

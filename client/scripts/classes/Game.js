@@ -12,6 +12,7 @@ class Game {
         this._worldRenderer = new WorldRenderer(this);
         this._packetManager = new PacketManager(this);
         this._loggerRenderer = new LoggerRenderer(this);
+        this._textureManager = new TextureManager(this);
 
         this.debug = {
             fps: 0,
@@ -224,6 +225,10 @@ class Game {
 
     getLoggerRenderer() {
         return this._loggerRenderer;
+    }
+
+    getTextureManager() {
+        return this._textureManager;
     }
 
     canMove(x, y) {

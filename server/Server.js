@@ -9,7 +9,7 @@ class Server {
         
         this._worldManager = new WorldManager(this, map);
 
-        this.defaultSpawnPosition = [5,5]
+        this.defaultSpawnPosition = [3,3]
     }
 
     start(port) {

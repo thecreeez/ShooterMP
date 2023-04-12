@@ -47,19 +47,6 @@ class Game {
 
         if (!GAME_EVENT_WONT_DELETE_FRAMES) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            if (!SHOULD_RENDER_SKYBOX) {
-                ctx.fillStyle = "black";
-
-                if (GAME_EVENT_INVERTED_COLORS) {
-                    ctx.fillStyle = "white";
-                }
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            } else {
-                this.renderSky();
-                this.renderFloor();
-            }
-            
         }
 
         if (this._worldRenderer.shouldRender) {
@@ -73,29 +60,12 @@ class Game {
         this.debug.fpsC++;
     }
 
-    renderSky() {
-        ctx.fillStyle = `rgb(${SKY_COLOR[0]},${SKY_COLOR[1]},${SKY_COLOR[2]})`;
-
-        if (GAME_EVENT_INVERTED_COLORS) {
-            ctx.fillStyle = `rgb(${255 - SKY_COLOR[0]},${255 - SKY_COLOR[1]},${255 - SKY_COLOR[2]})`;
-        }
-        ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
-    }
-
-    renderFloor() {
-        ctx.fillStyle = `rgb(${FLOOR_COLOR[0]},${FLOOR_COLOR[1]},${FLOOR_COLOR[2]})`;
-
-        if (GAME_EVENT_INVERTED_COLORS) {
-            ctx.fillStyle = `rgb(${255 - FLOOR_COLOR[0]},${255 - FLOOR_COLOR[1]},${255 - FLOOR_COLOR[2]})`;
-        }
-        ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
-    }
-
     renderDebug() {
         ctx.fillStyle = "white";
         ctx.font = "20px arial";
         ctx.fillText("FPS: " + this.debug.fps + " Ticks: " + this.debug.ticks + " Rays: " + this._worldRenderer._rays + " MD: " + this._worldRenderer._maxDistance + " Draws: " + this.debug.draws + " Pos: " + this._camera.pos, 10, canvas.height - 60);
         ctx.fillText("Name: " + localStorage.getItem("username"), 10, canvas.height - 80);
+        ctx.fillText("Time: "+this._worldRenderer._deltaLight, 10, canvas.height - 100);
         this._loggerRenderer.render([10, 10], 50);
     }
 
@@ -197,6 +167,10 @@ class Game {
 
         if (this.inputManager.isPressed("KeyG")) {
             this._worldRenderer._maxDistance -= 0.1;
+        }
+
+        if (this.inputManager.isPressed("KeyE")) {
+            this._loggerRenderer.log("Game", "Кажется эта кнопка не является интерактивной.", LOG_TYPE.DEFAULT);
         }
 
         if (this._camera.pos[0] < 0)

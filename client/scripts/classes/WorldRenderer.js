@@ -66,6 +66,9 @@ class WorldRenderer {
         })
 
         this[renderMethod](this._entities);
+
+        if (GAME_EVENT_Y_IS_RAYS)
+            this._rays = 5000 / this._game._camera.pos[1]
     }
 
     _renderWallsWithTexture(entities) {
@@ -182,6 +185,9 @@ class WorldRenderer {
 
     _renderTexturedLine(x, y, width, height, xOffset, texture, distance) {
         for (let i = 0; i < texture.length; i++) {
+            if (GAME_EVENT_MAX_DRAWS_IS_1000 && this._game.debug.draws > 1000)
+                return;
+
             let r = texture[i][xOffset][0];
             let g = texture[i][xOffset][1];
             let b = texture[i][xOffset][2];
@@ -198,6 +204,9 @@ class WorldRenderer {
     }
 
     _renderLine(x,y,width,height) {
+        if (GAME_EVENT_MAX_DRAWS_IS_1000 && this._game_debug.draws > 1000)
+            return;
+
         ctx.fillRect(x,y,width,height);
 
         this._game.debug.draws++;

@@ -1,5 +1,8 @@
 const UPS = 60;
 
+const GAME_EVENT_Y_IS_RAYS = false;
+const GAME_EVENT_MAX_DRAWS_IS_1000 = true;
+
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 

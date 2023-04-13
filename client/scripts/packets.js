@@ -24,7 +24,6 @@ GameInstance.getPacketManager().registerPacket("handshake", (args) => {
 GameInstance.getPacketManager().registerPacket("event", (args) => {
     switch (args[1]) {
         case "connect": {
-            console.log("Connect: ",args)
             GameInstance.join(JSON.parse(args[2]));
 
             GameInstance.getLoggerRenderer().log("PacketManager", "User " + JSON.parse(args[2]).name + " connected.", LOG_TYPE.DEFAULT)
@@ -32,7 +31,6 @@ GameInstance.getPacketManager().registerPacket("event", (args) => {
         }
 
         case "disconnect": {
-            console.log("Disconnect: ", args)
             GameInstance.disconnect(JSON.parse(args[2]));
 
             GameInstance.getLoggerRenderer().log("PacketManager", "User " + JSON.parse(args[2]).name + " disconnected.", LOG_TYPE.DEFAULT)

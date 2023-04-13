@@ -64,7 +64,7 @@ class Game {
     renderDebug() {
         ctx.fillStyle = "white";
         ctx.font = "20px arial";
-        ctx.fillText("FPS: " + this.debug.fps + " Ticks: " + this.debug.ticks + " Rays: " + this._worldRenderer._rays + " MD: " + this._worldRenderer._maxDistance + " Draws: " + this.debug.draws + " Pos: " + this._camera.pos, 10, canvas.height - 60);
+        ctx.fillText("FPS: " + this.debug.fps + " Ticks: " + this.debug.ticks + " Rays: " + this._worldRenderer._rays + " MD: " + this._worldRenderer._maxDistance + " Draws: " + this.debug.draws + " Pos: [" + Math.floor(this._camera.pos[0] * 10) / 10 + ", " + Math.floor(this._camera.pos[1] * 10) / 10 +"]", 10, canvas.height - 60);
         ctx.fillText("Name: " + localStorage.getItem("username"), 10, canvas.height - 80);
         ctx.fillText("Time: "+this._worldRenderer._deltaLight, 10, canvas.height - 100);
         this._loggerRenderer.render([10, 10], 50);

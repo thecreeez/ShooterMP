@@ -56,7 +56,6 @@ class WorldRenderer {
     }
 
     render() {
-
         if (!SHOULD_RENDER_SKYBOX) {
             ctx.fillStyle = "black";
 
@@ -251,6 +250,7 @@ class WorldRenderer {
             r = r * ((this._maxDistance - distance) / (this._maxDistance * 2))
             g = g * ((this._maxDistance - distance) / (this._maxDistance * 2))
             b = b * ((this._maxDistance - distance) / (this._maxDistance * 2))
+            a = a * ((this._maxDistance - distance) / (this._maxDistance * 0.2))
 
             if (GAME_EVENT_INVERTED_COLORS) {
                 r = 255 -r;

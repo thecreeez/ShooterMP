@@ -67,4 +67,5 @@ function sendMessage(message) {
         return GameInstance.getLoggerRenderer().log("Chat", "You can't send message without server", LOG_TYPE.ERROR);
 
     GameInstance._packetManager.send("chat/" + message);
+    GameInstance.getLoggerRenderer().log("Chat", "["+localStorage.getItem("username")+"]: "+message, LOG_TYPE.DEFAULT);
 }

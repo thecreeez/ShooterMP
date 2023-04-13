@@ -15,4 +15,8 @@ class EntityPlayer extends Entity {
 
         worldRenderer._renderTextOnWorld(this.pos, this.name, 20)
     }
+
+    getName() {
+        return this.name;
+    }
 }

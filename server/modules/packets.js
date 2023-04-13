@@ -50,6 +50,19 @@ function registerPackets(server) {
             }
         }
     })
+
+    server.getPacketManager().registerPacket("chat", (conn, args) => {
+        let sendedPlayer = server.getEntityManager().getPlayerByConnection(conn);
+        let messageTo = {
+            sender: sendedPlayer.getName(),
+            message: args[1]
+        }
+
+        server.getEntityManager().getPlayers().forEach((player) => {
+            if (player.name != sendedPlayer.name)
+                player.sendPacket("chat/" + JSON.stringify(messageTo));
+        })
+    })
 }
 
 export default registerPackets;

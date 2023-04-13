@@ -9,7 +9,7 @@ class LoggerRenderer {
             module: module,
             text: text,
             type: type,
-            time: 300,
+            time: 600,
         });
     }
 

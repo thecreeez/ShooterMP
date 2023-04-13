@@ -61,3 +61,10 @@ async function connect(ip, port) {
 function setNickname(newName) {
     localStorage.setItem("username", newName);
 }
+
+function sendMessage(message) {
+    if (GameInstance._packetManager._state != CONNECT_STATE.OPENED)
+        return GameInstance.getLoggerRenderer().log("Chat", "You can't send message without server", LOG_TYPE.ERROR);
+
+    GameInstance._packetManager.send("chat/" + message);
+}

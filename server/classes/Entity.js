@@ -18,6 +18,10 @@ class Entity {
         this.pos[1] += pos[1];
     }
 
+    getName() {
+        return this.name;
+    }
+
     setHeight(height) {
         this.height = height;
     }

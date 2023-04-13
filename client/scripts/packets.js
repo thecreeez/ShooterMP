@@ -50,3 +50,7 @@ GameInstance.getPacketManager().registerPacket("event", (args) => {
         }
     }
 })
+
+GameInstance.getPacketManager().registerPacket("chat", (args) => {
+    GameInstance.getLoggerRenderer().log("Chat", "[" + JSON.parse(args[1]).sender + "]: "+JSON.parse(args[1]).message, LOG_TYPE.DEFAULT)
+})

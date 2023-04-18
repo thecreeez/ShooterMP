@@ -27,7 +27,7 @@ class Entity {
             return;
 
         let posVec = new Vec2(this.pos[0], this.pos[1]);
-        let cam = worldRenderer._game._camera;
+        let cam = worldRenderer._gameState._camera;
 
         posVec.addVec(new Vec2(-cam.pos[0], -cam.pos[1]));
 
@@ -47,7 +47,7 @@ class Entity {
 
         ctx.fillStyle = this.getColor(posVec.getLength(), worldRenderer);
 
-        let texture = worldRenderer._game.getTextureManager().getEntityTexture(this.type);
+        let texture = worldRenderer._gameState.getGame().getTextureManager().getEntityTexture(this.type);
 
         if (!texture)
             return ctx.fillRect(canvas.width * xScreen, worldRenderer.getFloorY(posVec.getLength()), this.width * 2 / posVec.getLength(), canvas.height * worldRenderer.WORLD_SIZE / posVec.getLength());
@@ -65,7 +65,7 @@ class Entity {
             return false;
 
         let posVec = new Vec2(this.pos[0], this.pos[1]);
-        let cam = worldRenderer._game._camera;
+        let cam = worldRenderer._gameState._camera;
 
         posVec.addVec(new Vec2(-cam.pos[0], -cam.pos[1]));
 
@@ -92,7 +92,7 @@ class Entity {
 
     getDistanceToCamera(worldRenderer) {
         let posVec = new Vec2(this.pos[0], this.pos[1]);
-        let cam = worldRenderer._game._camera;
+        let cam = worldRenderer._gameState._camera;
 
         posVec.addVec(new Vec2(-cam.pos[0], -cam.pos[1]));
 
@@ -101,7 +101,7 @@ class Entity {
 
     isNeedRender(worldRenderer) {
         let posVec = new Vec2(this.pos[0], this.pos[1]);
-        let cam = worldRenderer._game._camera;
+        let cam = worldRenderer._gameState._camera;
 
         posVec.addVec(new Vec2(-cam.pos[0], -cam.pos[1]));
 

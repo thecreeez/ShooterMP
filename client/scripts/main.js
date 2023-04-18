@@ -8,7 +8,6 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 const GameInstance = new Game();
-let ticks = 0;
 
 window.onload = () => {
     load();
@@ -20,7 +19,10 @@ window.onload = () => {
 const LOOPS = {
 
 }
+
+
 update();
+
 function load() {
     console.log("Load!")
 }
@@ -45,7 +47,7 @@ async function debugSend(message) {
 
 async function connect(ip, port) {
     if (!localStorage.getItem("username")) {
-        return console.log("Невозможно подключиться к серверу, установите имя (setNickname('Имя'))")
+        GameInstance.getLoggerRenderer().log("Game", "Невозможно подключиться, установите имя (setNickname())", LOG_TYPE.ERROR)
     }
 
     try {
@@ -64,7 +66,7 @@ function setNickname(newName) {
 
 function sendMessage(message) {
     if (GameInstance._packetManager._state != CONNECT_STATE.OPENED)
-        return GameInstance.getLoggerRenderer().log("Chat", "You can't send message without server", LOG_TYPE.ERROR);
+        return GameInstance.getLoggerRenderer().log("Chat", "Вы не можете отправить сообщение без сервера", LOG_TYPE.ERROR)
 
     GameInstance._packetManager.send("chat/" + message);
     GameInstance.getLoggerRenderer().log("Chat", "["+localStorage.getItem("username")+"]: "+message, LOG_TYPE.DEFAULT);

@@ -8,13 +8,7 @@ GameInstance.getPacketManager().registerPacket("handshake", (args) => {
         }
 
         case "success": {
-            console.log("connected! ",JSON.parse(args[3]))
-            GameInstance.load({
-                map: JSON.parse(args[2]),
-                entities: JSON.parse(args[3]),
-                pos: JSON.parse(args[4])
-            });
-
+            GameInstance.setState(PlayState.fromServer(GameInstance, args))
             GameInstance.getLoggerRenderer().log("PacketManager", "Server successfully connected!", LOG_TYPE.FINE)
             break;
         }
@@ -24,15 +18,13 @@ GameInstance.getPacketManager().registerPacket("handshake", (args) => {
 GameInstance.getPacketManager().registerPacket("event", (args) => {
     switch (args[1]) {
         case "connect": {
-            GameInstance.join(JSON.parse(args[2]));
-
+            GameInstance.getState().addEntity(JSON.parse(args[2]))
             GameInstance.getLoggerRenderer().log("PacketManager", "User " + JSON.parse(args[2]).name + " connected.", LOG_TYPE.DEFAULT)
             break;
         }
 
         case "disconnect": {
-            GameInstance.disconnect(JSON.parse(args[2]));
-
+            GameInstance.getState().removeEntity(JSON.parse(args[2]));
             GameInstance.getLoggerRenderer().log("PacketManager", "User " + JSON.parse(args[2]).name + " disconnected.", LOG_TYPE.DEFAULT)
             break;
         }
@@ -41,7 +33,7 @@ GameInstance.getPacketManager().registerPacket("event", (args) => {
             let pos = JSON.parse(args[2]);
             let name = args[3];
 
-            let entity = GameInstance.getEntity(name);
+            let entity = GameInstance.getState().getEntity(name);
 
             if (entity)
                 entity.teleport(pos)

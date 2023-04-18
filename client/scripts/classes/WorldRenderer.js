@@ -1,8 +1,7 @@
 class WorldRenderer {
-    constructor(game) {
-        this._game = game;
+    constructor(gameState) {
+        this._gameState = gameState;
 
-        this.shouldRender = false;
         this._worldWalls = false;
 
         this._entities = [];
@@ -82,7 +81,7 @@ class WorldRenderer {
         this[renderMethod](this._entities);
 
         if (GAME_EVENT_Y_IS_RAYS)
-            this._rays = 5000 / this._game._camera.pos[1]
+            this._rays = 5000 / this._gameState._camera.pos[1]
     }
 
     renderSky() {
@@ -127,10 +126,10 @@ class WorldRenderer {
 
     _renderWallsWithTexture(entities) {
         for (let i = 0; i <= this._rays; i++) {
-            let angle = (-this._rays / 2 + i) * (this._game._camera.fov / this._rays);
+            let angle = (-this._rays / 2 + i) * (this._gameState._camera.fov / this._rays);
 
-            let cameraPosVec = new Vec2(this._game._camera.pos[0], this._game._camera.pos[1]);
-            let rayVec = Vec2.getByDirection(angle + this._game._camera.yaw);
+            let cameraPosVec = new Vec2(this._gameState._camera.pos[0], this._gameState._camera.pos[1]);
+            let rayVec = Vec2.getByDirection(angle + this._gameState._camera.yaw);
 
             let distanceToObj = -1;
             let currDistance = 0;
@@ -152,10 +151,10 @@ class WorldRenderer {
 
                 let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
 
-                if (this._game._camera.pitch != 0)
-                    canvasFrame *= this._game._camera.pitch;
+                if (this._gameState._camera.pitch != 0)
+                    canvasFrame *= this._gameState._camera.pitch;
 
-                let texture = this._game.getTextureManager().getWallTexture(Math.ceil(this._getWallId(new Vec2(wallPos[0], wallPos[1]))));
+                let texture = this._gameState.getGame().getTextureManager().getWallTexture(Math.ceil(this._getWallId(new Vec2(wallPos[0], wallPos[1]))));
 
                 let textureLine = Math.round(texture.length * Math.abs(intersectionPoint.y - wallPos[1]));
 
@@ -183,10 +182,10 @@ class WorldRenderer {
         let lastIntersection = null;
 
         for (let i = 0; i <= this._rays; i++) {
-            let angle = (-this._rays / 2 + i) * (this._game._camera.fov / this._rays);
+            let angle = (-this._rays / 2 + i) * (this._gameState._camera.fov / this._rays);
 
-            let cameraPosVec = new Vec2(this._game._camera.pos[0], this._game._camera.pos[1]);
-            let rayVec = Vec2.getByDirection(angle + this._game._camera.yaw);
+            let cameraPosVec = new Vec2(this._gameState._camera.pos[0], this._gameState._camera.pos[1]);
+            let rayVec = Vec2.getByDirection(angle + this._gameState._camera.yaw);
 
             let distanceToObj = -1;
             let currDistance = 0;
@@ -213,8 +212,8 @@ class WorldRenderer {
 
                 let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
 
-                if (this._game._camera.pitch != 0)
-                    canvasFrame *= this._game._camera.pitch;
+                if (this._gameState._camera.pitch != 0)
+                    canvasFrame *= this._gameState._camera.pitch;
 
                 ctx.fillStyle = this._getWallColor(this._getWallId(intersectionPoint), distanceToObj, i, isEdge);
 
@@ -239,7 +238,7 @@ class WorldRenderer {
 
     _renderTexturedLine(x, y, width, height, xOffset, texture, distance) {
         for (let i = 0; i < texture.length; i++) {
-            if (GAME_EVENT_MAX_DRAWS != -1 && this._game.debug.draws > GAME_EVENT_MAX_DRAWS)
+            if (GAME_EVENT_MAX_DRAWS != -1 && this._gameState.getGame().debug.draws > GAME_EVENT_MAX_DRAWS)
                 return;
 
             let r = texture[i][xOffset].r;
@@ -277,22 +276,22 @@ class WorldRenderer {
             let pixelWidth = (width * 3) / texture.length * 2.5;
             ctx.fillRect(x + (width / texture.length * xOffset) + pixelWidth / 2, y + (height / texture.length * i), (width * 3) / texture.length * 2.5, height / texture.length);
 
-            this._game.debug.draws++;
+            this._gameState.getGame().debug.draws++;
         }
     }
 
     _renderLine(x,y,width,height) {
-        if (GAME_EVENT_MAX_DRAWS != -1 && this._game.debug.draws > GAME_EVENT_MAX_DRAWS)
+        if (GAME_EVENT_MAX_DRAWS != -1 && this._gameState.getGame().debug.draws > GAME_EVENT_MAX_DRAWS)
             return;
 
         ctx.fillRect(x,y,width,height);
 
-        this._game.debug.draws++;
+        this._gameState.getGame().debug.draws++;
     }
 
     _renderTextOnWorld(pos, text, height) {
         let posVec = new Vec2(pos[0], pos[1]);
-        let cam = this._game._camera;
+        let cam = this._gameState._camera;
 
         posVec.addVec(new Vec2(-cam.pos[0], -cam.pos[1]));
 
@@ -397,8 +396,8 @@ class WorldRenderer {
 
         let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
 
-        if (this._game._camera.pitch != 0)
-            canvasFrame *= this._game._camera.pitch;
+        if (this._gameState._camera.pitch != 0)
+            canvasFrame *= this._gameState._camera.pitch;
         return canvasFrame;
     }
 }

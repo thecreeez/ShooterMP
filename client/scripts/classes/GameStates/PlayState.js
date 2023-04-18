@@ -96,7 +96,10 @@ class PlayState extends GameState {
     }
 
     _updateConnection() {
-
+        if (this._game.getPacketManager().getState() != CONNECT_STATE.OPENED) {
+            this._game.getLoggerRenderer().log("PacketManager", "Соединение с сервером прервано.", LOG_TYPE.ERROR)
+            this._game.setState(new MenuState(this._game));
+        }
     }
 
     _updateControls() {

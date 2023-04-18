@@ -5,6 +5,8 @@ class PlayState extends GameState {
         this._worldRenderer = new WorldRenderer(this);
 
         this.controlsEnabled = true;
+
+        let hudInner = 0;
     }
 
     static fromServer(game, args) {
@@ -35,27 +37,28 @@ class PlayState extends GameState {
     render() {
         this._worldRenderer.render();
 
+        let minimapSize = 10;
+
         this._renderMinimap({
-            pos: [10, 10],
-            size: 30
+            pos: [canvas.width - minimapSize * this._worldRenderer._worldWalls.length - 10, 10],
+            size: minimapSize
         });
         this._renderDebug({
-            pos: [10, 10],
-            size: 10
+            pos: [10, canvas.height / 2],
+            size: 20
         });
     }
 
     // To-do: Переделать мини-карту (Сделать передвигаемой и изменяемой по размеру)
-    _renderMinimap() {
+    _renderMinimap({pos, size}) {
         //200
         ctx.fillStyle = "black"
-        let onePlace = 400 / this._worldRenderer._worldWalls.length;
-        ctx.fillRect(10, 10, onePlace * this._worldRenderer._worldWalls[0].length, onePlace * this._worldRenderer._worldWalls.length);
+        ctx.fillRect(pos[0], pos[1], size * this._worldRenderer._worldWalls[0].length, size * this._worldRenderer._worldWalls.length);
         this._game.debug.draws++;
 
         ctx.fillStyle = "yellow";
-        let playerPos = [onePlace * this._camera.pos[0] - onePlace / 2, onePlace * this._camera.pos[1] - onePlace / 2];
-        ctx.fillRect(playerPos[0], playerPos[1], onePlace, onePlace)
+        let playerPos = [pos[0] + size * this._camera.pos[0] - size / 2, pos[1] + size * this._camera.pos[1] - size / 2];
+        ctx.fillRect(playerPos[0], playerPos[1], size, size)
         this._game.debug.draws++;
 
         ctx.strokeStyle = "blue"
@@ -73,7 +76,7 @@ class PlayState extends GameState {
                         case 2: ctx.fillStyle = "red"; break;
                         case 3: ctx.fillStyle = "green"; break;
                     }
-                    ctx.fillRect(10 + x * onePlace, 10 + y * onePlace, onePlace, onePlace)
+                    ctx.fillRect(pos[0] + x * size, pos[1] + y * size, size, size)
                     this._game.debug.draws++;
                 }
             })
@@ -81,11 +84,26 @@ class PlayState extends GameState {
     }
 
     _renderDebug({pos, size}) {
+        let i = 0;
         ctx.fillStyle = "white";
         ctx.font = size+"px arial";
-        ctx.fillText("FPS: " + this._game.debug.fps + " Ticks: " + this._game.debug.ticks + " Rays: " + this._worldRenderer._rays + " MD: " + this._worldRenderer._maxDistance + " Draws: " + this._game.debug.draws + " Pos: [" + Math.floor(this._camera.pos[0] * 10) / 10 + ", " + Math.floor(this._camera.pos[1] * 10) / 10 + "]", 10, canvas.height - 60);
-        ctx.fillText("Name: " + localStorage.getItem("username"), 10, canvas.height - 80);
-        ctx.fillText("Time: " + this._worldRenderer._deltaLight, 10, canvas.height - 100);
+
+        ctx.fillText("FPS: " + this._game.debug.fps + " Ticks: " + this._game.debug.ticks, pos[0], pos[1] + (size * 1.05) * i);
+        i++;
+
+        ctx.fillText("Max Distance: " + (Math.floor(this._worldRenderer._maxDistance * 10) / 10) + " Rays: " + this._worldRenderer._rays, pos[0], pos[1] + size * i);
+        i++;
+
+        ctx.fillText("Render: " + RENDER_TYPE + " Draws: " + this._game.debug.draws, pos[0], pos[1] + size * i);
+        i++;
+
+        ctx.fillText("Light: " + this._worldRenderer._deltaLight + " Pos: [" + Math.floor(this._camera.pos[0] * 10) / 10 + ", " + Math.floor(this._camera.pos[1] * 10) / 10 + "]", pos[0], pos[1] + size * i);
+        i++;
+
+        ctx.fillText("Net: " + this._game.getPacketManager().getState() + " Players: " + this._worldRenderer.getEntities().length, pos[0], pos[1] + size * i);
+        i++;
+
+        ctx.fillText("Name: " + localStorage.getItem("username"), pos[0], pos[1] + size * i);
     }
 
     update() {
@@ -93,6 +111,8 @@ class PlayState extends GameState {
             this._updateControls();
 
         this._updateConnection();
+
+        this.hudInner++;
     }
 
     _updateConnection() {

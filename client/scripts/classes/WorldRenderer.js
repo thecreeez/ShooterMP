@@ -42,6 +42,10 @@ class WorldRenderer {
         return entity;
     } 
 
+    getEntities() {
+        return this._entities;
+    }
+
     removeEntity(entityName) {
         let removeI = -1;
         this._entities.forEach((entityCandidate, index) => {

@@ -36,7 +36,9 @@ GameInstance.getPacketManager().registerPacket("event", (args) => {
             let entity = GameInstance.getState().getEntity(name);
 
             if (entity)
-                entity.teleport(pos)
+                entity.teleport(pos);
+
+            break;
         }
     }
 })

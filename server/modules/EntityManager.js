@@ -20,6 +20,7 @@ class EntityManager {
     }
 
     connectPlayer(name, connection) {
+        let player = new EntityPlayer(this, name, connection, this._server.getWorldManager().getSpawnPosition());
         this._entities.set(name, player);
         this._logger.log("Player "+name+" joined the game.")
 

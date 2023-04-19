@@ -5,9 +5,9 @@
     "textures": [
         "brick1",
         "brick2",
-        "bookshelf"
+        "console1"
     ],
     "spawnPositions": [
-        [3,3]
+        [3.7,3.7]
     ]
 }

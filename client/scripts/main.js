@@ -4,8 +4,8 @@ const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d", { alpha: false });
 ctx.imageSmoothingEnabled = false;
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = window.innerWidth - 50;
+canvas.height = window.innerHeight - 50;
 
 const GameInstance = new Game();
 
@@ -25,6 +25,7 @@ update();
 
 function load() {
     console.log("Load!")
+    connect("localhost", 2020)
 }
 
 function update() {
@@ -34,11 +35,6 @@ function update() {
 
 function count() {
     GameInstance.count();
-}
-
-async function connect() {
-    await GameInstance._packetManager.connect("localhost", 2020);
-    console.log("connected!");
 }
 
 async function debugSend(message) {

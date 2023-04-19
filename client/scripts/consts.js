@@ -1,8 +1,3 @@
-const RENDER_TYPES = {
-    OPTIMIZED: 0,
-    TEXTURIZED: 1
-}
-
 // Rays is 5000 / y
 let GAME_EVENT_Y_IS_RAYS = false;
 
@@ -20,8 +15,6 @@ let GAME_EVENT_WONT_DELETE_FRAMES = false;
 
 // Max draws per frame
 let GAME_EVENT_MAX_DRAWS = -1;
-
-let RENDER_TYPE = RENDER_TYPES.TEXTURIZED; 
 
 let SHOULD_RENDER_SKYBOX = true;
 let SKY_COLOR = [0,15,0];

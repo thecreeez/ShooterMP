@@ -1,8 +1,8 @@
 class Camera {
-    constructor(game) {
+    constructor(game, yaw) {
         this._game = game;
         this.pos = [10,20];
-        this.yaw = 0;
+        this.yaw = yaw;
         this.pitch = 0;
         this.fov = 110;
     }

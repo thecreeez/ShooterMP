@@ -227,10 +227,10 @@ class WorldRenderer {
             let b = texture[i][xOffset].b;
             let a = 1
 
-            r = r * ((this._maxDistance - distance) / (this._maxDistance * 2))
-            g = g * ((this._maxDistance - distance) / (this._maxDistance * 2))
-            b = b * ((this._maxDistance - distance) / (this._maxDistance * 2))
-            //a = a * ((this._maxDistance - distance) / (this._maxDistance * 0.2))
+            r = r * ((this._maxDistance - distance) / (this._maxDistance * 1.3))
+            g = g * ((this._maxDistance - distance) / (this._maxDistance * 1.3))
+            b = b * ((this._maxDistance - distance) / (this._maxDistance * 1.3))
+            a = a * ((this._maxDistance - distance) / (this._maxDistance * 0.05))
 
             if (GAME_EVENT_INVERTED_COLORS) {
                 r = 255 -r;
@@ -317,54 +317,6 @@ class WorldRenderer {
 
     _getWallPosByVec(vec2) {
         return [Math.round(vec2.x), Math.round(vec2.y)];
-    }
-
-    _getWallColor(id, distance, i, isEdge) {
-        let r = 255;
-        let g = 255;
-        let b = 255;
-        let a = 1;
-
-        switch (Math.ceil(id)) {
-            case 1: {
-                r = 255 * ((this._maxDistance - distance) / (this._maxDistance * 2))
-                g = 255 * ((this._maxDistance - distance) / (this._maxDistance * 2))
-                b = 255 * ((this._maxDistance - distance) / (this._maxDistance * 2))
-                break;
-            }
-
-            case 2: {
-                r = 255 * ((this._maxDistance - distance) / (this._maxDistance * 2))
-                g = 0;
-                b = 0;
-                break;
-            }
-
-            case 3: {
-                r = 0;
-                g = 255 * ((this._maxDistance - distance) / (this._maxDistance * 2));
-                b = 0;
-                break;
-            }
-        }
-
-        if (id % 1 != 0)
-            a = id % 1;
-
-        if (isEdge) {
-            r = 12;
-            g = 12;
-            b = 12;
-            a = 1;
-        }
-
-        if (GAME_EVENT_INVERTED_COLORS) {
-            r = 255 - r;
-            g = 255 - g;
-            b = 255 - b;
-        }
-
-        return `rgba(${r}, ${g}, ${b}, ${a})`
     }
 
     getFloorY(distance) {

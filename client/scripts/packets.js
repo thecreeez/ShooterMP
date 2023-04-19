@@ -8,9 +8,27 @@ GameInstance.getPacketManager().registerPacket("handshake", (args) => {
         }
 
         case "success": {
-            GameInstance.setState(PlayState.fromServer(GameInstance, args))
-            GameInstance.getLoggerRenderer().log("PacketManager", "Server successfully connected!", LOG_TYPE.FINE)
+            //)
+            GameInstance.getLoggerRenderer().log("PacketManager", "Connected! Map: "+args[2]+" by "+args[3], LOG_TYPE.FINE)
             break;
+        }
+
+        case "textures": {
+            let id = args[2];
+            let data = JSON.parse(args[3]);
+
+            GameInstance.getTextureManager().setTexture(id, data);
+            GameInstance.getLoggerRenderer().log("PacketManager", "Loaded texture "+id+" ["+data.length+"x"+data[0].length+"]", LOG_TYPE.DEFAULT)
+            break;
+        }
+
+        case "end": {
+            GameInstance.setState(PlayState.fromServer(GameInstance, args))
+            break;
+        }
+
+        default: {
+            console.log(args);
         }
     }
 })

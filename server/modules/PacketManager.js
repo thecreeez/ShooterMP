@@ -2,8 +2,9 @@ import sockjs from "sockjs";
 import http from "http";
 
 class PacketManager {
-    constructor(server) {
+    constructor(server, logger) {
         this._server = server;
+        this._logger = logger;
         this._socket = sockjs.createServer({ prefix: "/socket", disable_cors: false});
 
         this._socket.on('connection', (conn) => {
@@ -27,7 +28,7 @@ class PacketManager {
 
     start(port) {
         this._httpServer.listen(port);
-        console.log("SERVER", "Сервер запущен на порте " + port);
+        this._logger.log("Сервер запущен на порте " + port)
     }
 
     receive(conn, data) {
@@ -36,7 +37,7 @@ class PacketManager {
         if (this.packets[args[0]])
             this.packets[args[0]](conn, args);
         else
-            console.error("PACKET", "Неизвестный пакет: " + args[0])
+            this._logger.error("Неизвестный пакет: " + args[0])
     }
 
     sendPacket(conn, data) {

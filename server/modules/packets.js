@@ -13,14 +13,27 @@ function registerPackets(server) {
 
         let newPlayer = server.getEntityManager().connectPlayer(name, conn);
 
+        // ОТСЫЛКА ПЕРВЫХ ДАННЫХ (ИМЯ КАРТЫ И АВТОРА)
         let message = "handshake/success/";
-        message += JSON.stringify(server.getWorldManager().getMap()) + "/";
+        message += JSON.stringify(server.getWorldManager().getName()) + "/";
+        message += JSON.stringify(server.getWorldManager().getAuthor());
+        conn.write(message);
+
+        // ОТСЫЛКА ТЕКСТУР
+        for (let i = 1; i < server.getMapLoader().getTexturesLength(); i++) {
+            message = "handshake/textures/"+i+"/"+JSON.stringify(server.getMapLoader().getTexture(i));
+            conn.write(message);
+        }
+
+        // ОТСЫЛКА КООРДИНАТ И ДРУГИХ СУЩНОСТЕЙ
+        message = "handshake/end/";
+        message += JSON.stringify(server.getWorldManager().getTiles()) + "/"
         message += JSON.stringify(server.getEntityManager().getSerializedEntities({
             except: name
         })) + "/";
         message += JSON.stringify(newPlayer.pos);
-
         conn.write(message);
+
         server.getEntityManager().getPlayers().forEach((player) => {
             if (player.name != name)
                 player.sendPacket("event/connect/" + JSON.stringify(newPlayer.serialize()));

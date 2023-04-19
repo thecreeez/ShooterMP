@@ -1,11 +1,10 @@
 import EntityPlayer from "../classes/EntityPlayer.js";
 
 class EntityManager {
-    constructor(server) {
+    constructor(server, logger) {
         this._server = server;
+        this._logger = logger;
         this._entities = new Map();
-
-        this._entities.set("test", new EntityPlayer(this, "test", null, [5,5]))
     }
 
     update() {
@@ -21,8 +20,8 @@ class EntityManager {
     }
 
     connectPlayer(name, connection) {
-        let player = new EntityPlayer(this, name, connection, this._server.defaultSpawnPosition);
         this._entities.set(name, player);
+        this._logger.log("Player "+name+" joined the game.")
 
         return player;
     }
@@ -30,6 +29,7 @@ class EntityManager {
     disconnect(connId) {
         for (let entity of this._entities) {
             if (entity[1]._connection && entity[1]._connection.id == connId) {
+                this._logger.log("Player " + entity[0] + " disconnected from game.")
                 this._entities.delete(entity[0])
 
                 this.getPlayers().forEach((player) => {

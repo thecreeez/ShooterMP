@@ -1,0 +1,13 @@
+{
+    "name": "lab",
+    "author": "TheCreeeZ",
+    "maxPlayers": 4,
+    "textures": [
+        "brick1",
+        "brick2",
+        "bookshelf"
+    ],
+    "spawnPositions": [
+        [3,3]
+    ]
+}

@@ -50,9 +50,9 @@ class Entity {
         let texture = worldRenderer._gameState.getGame().getTextureManager().getEntityTexture(this.type);
 
         if (!texture)
-            return ctx.fillRect(canvas.width * xScreen, worldRenderer.getFloorY(posVec.getLength()), this.width * 2 / posVec.getLength(), canvas.height * worldRenderer.WORLD_SIZE / posVec.getLength());
+            return ctx.fillRect(canvas.width * xScreen, worldRenderer.getFloorY(posVec.getLength()), this.width * 2 / posVec.getLength(), canvas.height * worldRenderer._worldHeight / posVec.getLength());
 
-        ctx.drawImage(texture, canvas.width * xScreen, worldRenderer.getFloorY(posVec.getLength()), this.width * 2 / posVec.getLength(), canvas.height * worldRenderer.WORLD_SIZE / posVec.getLength())
+        ctx.drawImage(texture, canvas.width * xScreen, worldRenderer.getFloorY(posVec.getLength()), this.width * 2 / posVec.getLength(), canvas.height * worldRenderer._worldHeight / posVec.getLength())
     }
 
     getColor(distance, worldRenderer) {

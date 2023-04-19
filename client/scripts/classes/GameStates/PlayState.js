@@ -2,11 +2,16 @@ class PlayState extends GameState {
     constructor(game) {
         super("scene", game)
         this._camera = new Camera(this);
-        this._worldRenderer = new WorldRenderer(this);
+        this._worldRenderer = new WorldRenderer({
+            state: this,
+            deltaLight: 1,
+            maxDistance: 15,
+            rays: 300
+        });
 
         this.controlsEnabled = true;
 
-        let hudInner = 0;
+        this.inverted = false;
     }
 
     static fromServer(game, args) {
@@ -41,7 +46,8 @@ class PlayState extends GameState {
 
         this._renderMinimap({
             pos: [canvas.width - minimapSize * this._worldRenderer._worldWalls.length - 10, 10],
-            size: minimapSize
+            size: minimapSize,
+            drawNames: true
         });
         this._renderDebug({
             pos: [10, canvas.height / 2],
@@ -50,23 +56,12 @@ class PlayState extends GameState {
     }
 
     // To-do: Переделать мини-карту (Сделать передвигаемой и изменяемой по размеру)
-    _renderMinimap({pos, size}) {
-        //200
-        ctx.fillStyle = "black"
-        ctx.fillRect(pos[0], pos[1], size * this._worldRenderer._worldWalls[0].length, size * this._worldRenderer._worldWalls.length);
+    _renderMinimap({pos, size, drawNames}) {
+        let mapSizeX = size * this._worldRenderer._worldWalls[0].length;
+        let mapSizeY = size * this._worldRenderer._worldWalls.length;
+        ctx.fillStyle = MAP_COLORS.BACKGROUND;
+        ctx.fillRect(pos[0], pos[1], mapSizeX, mapSizeY);
         this._game.debug.draws++;
-
-        ctx.fillStyle = "yellow";
-        let playerPos = [pos[0] + size * this._camera.pos[0] - size / 2, pos[1] + size * this._camera.pos[1] - size / 2];
-        ctx.fillRect(playerPos[0], playerPos[1], size, size)
-        this._game.debug.draws++;
-
-        ctx.strokeStyle = "blue"
-        ctx.beginPath();
-        ctx.moveTo(10 + playerPos[0], 10 + playerPos[1]);
-        ctx.lineTo(10 + playerPos[0] + Vec2.getByDirection(this._camera.yaw).x * 30, 10 + playerPos[1] + Vec2.getByDirection(this._camera.yaw).y * 30)
-        ctx.stroke()
-
 
         this._worldRenderer._worldWalls.forEach((row, y) => {
             row.forEach((place, x) => {
@@ -81,6 +76,40 @@ class PlayState extends GameState {
                 }
             })
         })
+
+        // ENTITY RENDER
+        this._worldRenderer.getEntities().forEach((entity, index) => {
+            let entityPosOnMap = [entity.pos[0] * size, entity.pos[1] * size];
+
+            ctx.fillStyle = MAP_COLORS.ENEMY;
+            ctx.beginPath();
+            ctx.arc(pos[0] + entityPosOnMap[0], pos[1] + entityPosOnMap[1], size / 2, 0, 2 * Math.PI);
+            ctx.fill();
+            this._game.debug.draws++;
+
+            if (drawNames) {
+                ctx.font = (size)+"px arial";
+                ctx.fillStyle = "white";
+                ctx.fillText(entity.name, pos[0] + entityPosOnMap[0] - ctx.measureText(entity.name).width / 2, pos[1] + entityPosOnMap[1] - size / 1.5)
+            }
+        })
+
+        let cameraPosOnMap = [size * this._camera.pos[0], size * this._camera.pos[1]];
+
+        // LOOK VECTOR
+        ctx.strokeStyle = MAP_COLORS.VECTORS;
+        ctx.beginPath();
+        ctx.moveTo(pos[0] + cameraPosOnMap[0], pos[1] + cameraPosOnMap[1]);
+        ctx.lineTo(pos[0] + cameraPosOnMap[0] + Vec2.getByDirection(this._camera.yaw).x * size * 2, pos[1] + cameraPosOnMap[1] + Vec2.getByDirection(this._camera.yaw).y * size * 2)
+        ctx.stroke()
+        this._game.debug.draws++;
+
+        // BODY CIRCLE
+        ctx.fillStyle = MAP_COLORS.PLAYER;
+        ctx.beginPath();
+        ctx.arc(pos[0] + cameraPosOnMap[0], pos[1] + cameraPosOnMap[1], size / 2, 0, 2 * Math.PI);
+        ctx.fill();
+        this._game.debug.draws++;
     }
 
     _renderDebug({pos, size}) {
@@ -97,7 +126,7 @@ class PlayState extends GameState {
         ctx.fillText("Render: " + RENDER_TYPE + " Draws: " + this._game.debug.draws, pos[0], pos[1] + size * i);
         i++;
 
-        ctx.fillText("Light: " + this._worldRenderer._deltaLight + " Pos: [" + Math.floor(this._camera.pos[0] * 10) / 10 + ", " + Math.floor(this._camera.pos[1] * 10) / 10 + "]", pos[0], pos[1] + size * i);
+        ctx.fillText("Light: " + Math.floor(this._worldRenderer._deltaLight * 10) / 10 + " Pos: [" + Math.floor(this._camera.pos[0] * 10) / 10 + ", " + Math.floor(this._camera.pos[1] * 10) / 10 + "]", pos[0], pos[1] + size * i);
         i++;
 
         ctx.fillText("Net: " + this._game.getPacketManager().getState() + " Players: " + this._worldRenderer.getEntities().length, pos[0], pos[1] + size * i);
@@ -111,8 +140,20 @@ class PlayState extends GameState {
             this._updateControls();
 
         this._updateConnection();
+        this._updateDayCycle();
+    }
 
-        this.hudInner++;
+    _updateDayCycle() {
+        let cyclePeriod = 5000;
+        if (this._game.debug.ticks % cyclePeriod == 0) {
+            this.inverted = !this.inverted;
+        }
+
+        if (this.inverted) {
+            this._worldRenderer._deltaLight = (this._game.debug.ticks % cyclePeriod) / cyclePeriod;
+        } else {
+            this._worldRenderer._deltaLight = (cyclePeriod - (this._game.debug.ticks % cyclePeriod)) / cyclePeriod;
+        }
     }
 
     _updateConnection() {
@@ -179,7 +220,7 @@ class PlayState extends GameState {
         }
 
         if (inputManager.isPressed("KeyE")) {
-            this._loggerRenderer.log("Game", "Кажется эта кнопка не является интерактивной.", LOG_TYPE.DEFAULT);
+            console.log(this._worldRenderer.getCameraLookAt());
         }
 
         if (this._camera.pos[0] < 0)

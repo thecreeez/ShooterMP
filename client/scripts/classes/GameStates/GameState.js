@@ -3,7 +3,7 @@ class GameState {
         this._id = id;
         this._game = game;
 
-        game.getLoggerRenderer().log("Game", "Loaded " + this._id + " state.", LOG_TYPE.DEFAULT)
+        console.log("Loaded " + this._id + " state.")
     }
 
     render() {

@@ -1,18 +1,17 @@
 class WorldRenderer {
-    constructor(gameState) {
-        this._gameState = gameState;
+    constructor({state, rays, maxDistance, deltaLight}) {
+        this._gameState = state;
 
         this._worldWalls = false;
 
         this._entities = [];
 
-        this._maxDistance = 30;
-        this._rays = 200;
+        this._maxDistance = maxDistance;
+        this._rays = rays;
 
-        this.WORLD_SIZE = 1;
-        this.textureRender = true;
+        this._worldHeight = 1;
 
-        this._deltaLight = 1;
+        this._deltaLight = deltaLight;
     }
 
     setMap(map) {
@@ -56,6 +55,10 @@ class WorldRenderer {
 
         if (removeI != -1)
             this._entities.splice(removeI, 1);
+    }
+
+    getCameraLookAt() {
+        return null
     }
 
     render() {
@@ -151,7 +154,7 @@ class WorldRenderer {
                 let intersectionPoint = Vec2.addVectors(cameraPosVec, rayVec);
                 let wallPos = this._getWallPosByVec(intersectionPoint);
 
-                let height = this.WORLD_SIZE / distanceToObj / Math.cos(angle * (Math.PI / 180));
+                let height = this._worldHeight / distanceToObj / Math.cos(angle * (Math.PI / 180));
 
                 let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
 
@@ -212,7 +215,7 @@ class WorldRenderer {
                     isEdge = true;
                 }
 
-                let height = this.WORLD_SIZE / distanceToObj / Math.cos(angle * (Math.PI / 180));
+                let height = this._worldHeight / distanceToObj / Math.cos(angle * (Math.PI / 180));
 
                 let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
 
@@ -318,7 +321,7 @@ class WorldRenderer {
 
         ctx.fillStyle = "red";
         ctx.font = (100 / posVec.getLength())+"px arial";
-        ctx.fillText(text, canvas.width * xScreen, this.getFloorY(posVec.getLength()) + canvas.height * this.WORLD_SIZE / posVec.getLength() / 2 + height / posVec.getLength())
+        ctx.fillText(text, canvas.width * xScreen, this.getFloorY(posVec.getLength()) + canvas.height * this._worldHeight / posVec.getLength() / 2 + height / posVec.getLength())
     }
 
     _getWallId(vec2) {
@@ -396,7 +399,7 @@ class WorldRenderer {
     }
 
     getFloorY(distance) {
-        let height = this.WORLD_SIZE / distance;
+        let height = this._worldHeight / distance;
 
         let canvasFrame = (canvas.height - (canvas.height * height)) / 2;
 

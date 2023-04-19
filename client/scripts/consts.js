@@ -26,3 +26,12 @@ let RENDER_TYPE = RENDER_TYPES.TEXTURIZED;
 let SHOULD_RENDER_SKYBOX = true;
 let SKY_COLOR = [0,15,0];
 let FLOOR_COLOR = [25, 120, 0]
+
+let MAP_COLORS = {
+    BACKGROUND: "black",
+    PLAYER: "yellow",
+    WALLS: "gray",
+    ALLIES: "green",
+    ENEMY: "red",
+    VECTORS: "purple"
+}

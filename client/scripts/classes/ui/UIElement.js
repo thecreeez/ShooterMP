@@ -21,7 +21,7 @@ class UIElement {
 
     update() {
         if (this.animationState < 1)
-            this.animationState+=0.01;
+            this.animationState+=0.15;
     }
 
     checkHover(pos) {

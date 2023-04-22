@@ -1,20 +1,20 @@
 class UIButton extends UIElement {
+    static getMinWidth() {
+        return 200;
+    }
+
     constructor({state, pos, text, onClick, isActive, isRender, layer}) {
         super({
             state: state,
             pos: pos,
             onclick: onClick,
             layer: layer,
-            isRender: isActive,
+            isRender: isRender,
             isActive: isActive
         })
 
         this._text = text;
         this._defaultFontSize = 30;
-
-        this._defaultColor = [0,0,51];
-        this._hoverColor = [0,51,204];
-        this._inactiveColor = [0,0,20];
     }
 
     static createDefault({state, pos, text, layer, onClick}) {
@@ -35,6 +35,9 @@ class UIButton extends UIElement {
         let buttonWidth = ctx.measureText(this._text).width * 1.5;
         let buttonHeight = this._defaultFontSize * 1.3;
 
+        if (buttonWidth < UIButton.getMinWidth())
+            buttonWidth = UIButton.getMinWidth();
+
         this._setColor();
 
         let posOffset = [0,0];
@@ -45,7 +48,7 @@ class UIButton extends UIElement {
         ctx.fillRect(this._pos[0] - buttonWidth / 2 + posOffset[0], this._pos[1] - buttonHeight + posOffset[1], buttonWidth, buttonHeight);
 
         ctx.fillStyle = "white";
-        ctx.fillText(this._text + " " + this.animationState, this._pos[0] - ctx.measureText(this._text).width / 2 + posOffset[0], this._pos[1] - this._defaultFontSize * 0.3 + posOffset[1]);
+        ctx.fillText(this._text, this._pos[0] - ctx.measureText(this._text).width / 2 + posOffset[0], this._pos[1] - this._defaultFontSize * 0.3 + posOffset[1]);
     }
 
     _getSize() {
@@ -54,25 +57,28 @@ class UIButton extends UIElement {
         let buttonWidth = ctx.measureText(this._text).width * 1.5;
         let buttonHeight = this._defaultFontSize * 1.3;
 
+        if (buttonWidth < UIButton.getMinWidth())
+            buttonWidth = UIButton.getMinWidth();
+
         return [buttonWidth, buttonHeight];
     }
 
     _setColor() {
-        let r = this._inactiveColor[0];
-        let g = this._inactiveColor[1];
-        let b = this._inactiveColor[2];
+        let r = HUD_COLORS.BUTTON_INACTIVE[0];
+        let g = HUD_COLORS.BUTTON_INACTIVE[1];
+        let b = HUD_COLORS.BUTTON_INACTIVE[2];
 
         if (!this.isActive)
             return ctx.fillStyle = `rgb(${r},${g},${b})`;
 
         if (this.isHover) {
-            r = this._hoverColor[0] - this._defaultColor[0] * (1-this.animationState);
-            g = this._hoverColor[1] - this._defaultColor[1] * (1-this.animationState);
-            b = this._hoverColor[2] - this._defaultColor[2] * (1-this.animationState);
+            r = HUD_COLORS.BUTTON_HOVER[0] - HUD_COLORS.BUTTON_DEFAULT[0] * (1-this.animationState);
+            g = HUD_COLORS.BUTTON_HOVER[1] - HUD_COLORS.BUTTON_DEFAULT[1] * (1-this.animationState);
+            b = HUD_COLORS.BUTTON_HOVER[2] - HUD_COLORS.BUTTON_DEFAULT[2] * (1-this.animationState);
         } else {
-            r = this._defaultColor[0] - this._hoverColor[0] * (1-this.animationState);
-            g = this._defaultColor[1] - this._hoverColor[1] * (1-this.animationState);
-            b = this._defaultColor[2] - this._hoverColor[2] * (1-this.animationState);
+            r = HUD_COLORS.BUTTON_DEFAULT[0] + HUD_COLORS.BUTTON_HOVER[0] * (1-this.animationState);
+            g = HUD_COLORS.BUTTON_DEFAULT[1] + HUD_COLORS.BUTTON_HOVER[1] * (1-this.animationState);
+            b = HUD_COLORS.BUTTON_DEFAULT[2] + HUD_COLORS.BUTTON_HOVER[2] * (1-this.animationState);
         }
 
         return ctx.fillStyle = `rgb(${r},${g},${b})`;

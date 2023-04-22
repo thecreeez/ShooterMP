@@ -28,3 +28,9 @@ let MAP_COLORS = {
     ENEMY: "red",
     VECTORS: "purple"
 }
+
+let HUD_COLORS = {
+    BUTTON_DEFAULT: [0, 0, 51],
+    BUTTON_HOVER: [0, 51, 204],
+    BUTTON_INACTIVE: [0, 0, 20]
+}

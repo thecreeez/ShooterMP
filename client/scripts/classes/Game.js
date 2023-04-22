@@ -48,17 +48,18 @@ class Game {
         this.debug.ticks++;
     } 
 
-    onmouseup(pos) {
-        this.mouse.isDown = false;
-        this.mouse.focus = null;
-    }
-
     onmousemove(pos) {
         this._state.onmousemove(pos);
     }
 
     onmousedown(pos) {
+        this._state.onmousedown(pos);
         this.mouse.isDown = true;
+    }
+
+    onmouseup(pos) {
+        this._state.onmouseup(pos);
+        this.mouse.isDown = false;
     }
 
     count() {

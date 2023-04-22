@@ -25,7 +25,7 @@ update();
 
 function load() {
     console.log("Load!")
-    connect("localhost", 2020)
+    //connect("localhost", 2020)
 }
 
 function update() {

@@ -21,6 +21,14 @@ class GameState {
         
     }
 
+    onmousedown(pos) {
+
+    }
+
+    onmouseup(pos) {
+        
+    }
+
     getGame() {
         return this._game;
     }

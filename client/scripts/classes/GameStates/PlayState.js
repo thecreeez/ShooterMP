@@ -141,7 +141,7 @@ class PlayState extends GameState {
             this._updateControls();
 
         this._updateConnection();
-        this._updateDayCycle();
+        //this._updateDayCycle();
     }
 
     _updateDayCycle() {

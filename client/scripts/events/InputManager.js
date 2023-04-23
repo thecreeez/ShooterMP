@@ -73,8 +73,11 @@ class InputManager {
             this._game.getState().onkeypress(key);
     }
 
-    onkeydown(e) {
-        
+    onkeydown(ev) {
+        GameInstance.getState().onkeydown({
+            key: ev.key,
+            code: ev.code
+        })
     }
 
     getKeys() {

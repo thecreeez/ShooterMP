@@ -29,6 +29,10 @@ class Game {
         this._state = state;
     }
 
+    getState() {
+        return this._state;
+    }
+
     render() {
         this.debug.draws = 0;
 

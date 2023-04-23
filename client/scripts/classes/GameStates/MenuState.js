@@ -31,15 +31,39 @@ class MenuState extends GameState {
         this.elements.push(UIButton.createDefault({
             state: this,
             pos: [canvas.width / 2, canvas.height / 2 + this.elements[0]._defaultFontSize * 1.5],
-            text: "Test button",
+            text: "Update",
             layer: 0,
             onClick: (elem) => {
-                GameInstance.getLoggerRenderer().log("Game", "Кнопка работает, жесть!", LOG_TYPE.FINE)
+                let name = elem.getState().getNameInput();
+
+                if (name.getValue() == localStorage.getItem("username")) {
+                    GameInstance.getLoggerRenderer().log("Game", "Имя не изменилось", LOG_TYPE.DEFAULT)
+                    return;
+                }
+                GameInstance.getLoggerRenderer().log("Game", "Установлено имя: " + name.getValue(), LOG_TYPE.FINE)
+                localStorage.setItem("username", name.getValue())
             }
         }))
 
+        this.elements.push(UITextInput.createDefault({
+            state: this,
+            pos: [canvas.width / 2, canvas.height / 2 + this.elements[0]._defaultFontSize * 1.5 * 2],
+            placeholder: "Your name",
+            maxSymbols: 10,
+            layer: 0,
+            blackList: [" "]
+        }))
+
         this.elements[1].setActive(true);
+
+        if (localStorage.getItem("username"))
+            this.elements[2].setValue(localStorage.getItem("username"))
     }
+
+    getNameInput() {
+        return this.elements[2];
+    }
+
 
     render() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -55,6 +79,20 @@ class MenuState extends GameState {
         })
     }
 
+    onkeydown(ev) {
+        if (!this.getSelectedUI())
+            return false;
+
+        if (this.getSelectedUI().type != "input")
+            return false;
+
+        if (ev.code == "Backspace") {
+            this.getSelectedUI().removeSymb();    
+        } else {
+            this.getSelectedUI().addInValue(ev.key);
+        }
+    }
+
     onmousemove(pos) {
         this.elements.forEach((elem) => {
             elem.checkHover(pos);
@@ -62,6 +100,7 @@ class MenuState extends GameState {
     }
 
     onmousedown(pos) {
+        super.onmousedown(pos);
         this.elements.forEach((elem) => {
             elem.checkClick(pos);
         })

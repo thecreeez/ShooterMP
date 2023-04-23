@@ -74,4 +74,12 @@ class UIElement {
         this.isActive = state;
         this.animationState = 0;
     }
+
+    getState() {
+        return this._state;
+    }
+
+    isSelected() {
+        return this == this.getState().getSelectedUI()
+    }
 }

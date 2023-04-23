@@ -2,6 +2,7 @@ class GameState {
     constructor(id, game) {
         this._id = id;
         this._game = game;
+        this._selectedUI = null;
 
         console.log("Loaded " + this._id + " state.")
     }
@@ -22,14 +23,26 @@ class GameState {
     }
 
     onmousedown(pos) {
-
+        this.setSelectedUI(null);
     }
 
     onmouseup(pos) {
         
     }
 
+    onkeydown(ev) {
+        
+    }
+
     getGame() {
         return this._game;
+    }
+
+    setSelectedUI(elem) {
+        this._selectedUI = elem;
+    }
+
+    getSelectedUI() {
+        return this._selectedUI;
     }
 }

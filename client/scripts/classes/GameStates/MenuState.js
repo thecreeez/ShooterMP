@@ -54,7 +54,14 @@ class MenuState extends GameState {
             blackList: [" "]
         }))
 
-        this.elements[1].setActive(true);
+        this.elements.push(UISlider.createDefault({
+            state: this,
+            pos: [canvas.width / 2, canvas.height / 2 + this.elements[0]._defaultFontSize * 1.5 * 4],
+            text: "Sensivity",
+            min: 0,
+            max: 5,
+            value: 2.5
+        }))
 
         if (localStorage.getItem("username"))
             this.elements[2].setValue(localStorage.getItem("username"))
